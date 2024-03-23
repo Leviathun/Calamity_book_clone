@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://kit.fontawesome.com/451145afdd.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="css/Home.css" />
+  </head>
+  <body>
+
+<%- include('../templates/nav-bar-user-home') %>
+
+    <!--carousel slide start-->
+    <div id="carouselExampleIndicators" class="carousel slide">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="https://picsum.photos/900/156" class="d-block w-100 " alt="...">
+        </div>
+        <div class="carousel-item">
+          <img src="https://picsum.photos/900/155" class="d-block w-100 " alt="...">
+        </div>
+        <div class="carousel-item">
+          <img src="https://picsum.photos/900/154" class="d-block w-100 " alt="...">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    <!--carousel slide end-->
+    
+    <!--Flash container start-->
+    <!-- Flash sale start-->
+    <div class="containers wraper" id="Flash sale" style="margin-top: 30px; margin-bottom: 0px;">
+    
+      <div class="bannerTopic">
+        <div class="d-flex flex-column flex-lg-row center">
+            <h2 class="filterflashsale-title">
+              <i class="fa-solid fa-tag img-fluid"></i>
+              Promotion
+            </h2>
+      
+            <div class="">
+
+              <div id="counter" class="counter">
+
+                <ul class="countdown">
+                    <li class="first" style="display: none;">
+                        <div class="countdown_num" id="cd_day-82520" style="display: none;"></div><div id="cd_day"></div></li>
+                    <li>
+                        <div class="countdown_num" id="cd_hour-82520">07</div><div id="cd_hour">Hours</div></li>
+                    <li>
+                        <div class="countdown_num" id="cd_min-82520">38</div><div id="cd_minute">Minutes</div></li>
+                    <li class="last">
+                        <div class="countdown_num" id="cd_sec-82520">02</div><div id="cd_second">Seconds</div></li>
+                </ul>
+    
+                <div class="clear"><span>&nbsp;</span></div>
+
+              </div>
+
+              <div id="expired" style="display:none;">The deadline has passed.</div>
+
+            </div>
+          </div>
+          
+          <div class="btnViewall">
+            <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+          </div>
+
+      </div>
+      <!-- Flash sale end-->
+      
+      <div class="row">
+        <!-- Flash banner start-->
+        <div class="col-12 col-lg-4">
+          <div id="banner-slider-one">
+            <a href="#"> 
+              <img class="img-responsive" src="https://www.asiabooks.com/media/mageplaza/bannerslider/banner/image/f/l/flashsale_01092023.jpg" alt=""> 
+            </a>
+          </div>
+        </div>
+        <!-- Flash banner end-->
+        
+        <div class="col-12 col-lg-8">
+          <div class="products-con">
+
+            <!-- Placeholder for promotion products -->
+            <%// Filter products with discount percentage != 0 and limit to first 5
+            const filteredProducts = products.filter(product => product.percent !== 0).slice(0, 4);
+            if (filteredProducts.length === 0) { %>
+              <p>No products available</p>
+            <% } else { %>
+              <% filteredProducts.forEach(product => { %>
+                <div class="products-item">
+                  <div class="products-img position-relative">
+                    <a href="/product-page">
+                    <img src="<%= product.img_url %>" alt="<%= product.product_name %>" >
+                    </a>
+                    <p class="product-label position-absolute">
+                      <span class="line-1"><%= product.percent %></span> 
+                      <br>
+                      <a href="/test" class="nav-link"><span class="line-2">OFF</span> </a>
+                    </p>
+                  </div>
+                  <div class="products-detail">
+                    <p><span><%= product.product_name %></span></p>
+                    <p><%= product.category_type %></p>
+                  </div>
+                  <!-- Other product details -->
+                  <div class="products-price">
+                    <div class="discount">
+                      <p><i class="fa-solid fa-baht-sign"></i><%= product.price_discount %></p>
+                    </div>
+                    <div class="original">
+                      <p><span class="line-discount"><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
+                    </div>
+                  </div>
+                  <div class="products-buy">
+                    <div>
+                      <button class="addbag-b"><p>add to bag</p></button>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
+            <!-- Placeholder for promotion products -->
+
+          </div>             
+        </div>
+
+      </div>
+    </div>
+    <!--Flash container end-->
+
+    <!-- hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr-->
+    <!--Best seller container start-->
+    <!-- Best seller start-->
+    <div class="containers wraper" id="Best seller" style="margin-top: 100px; margin-bottom: 0px;">
+    
+      <div class="bannerTopic">
+        <div class="d-flex flex-column flex-lg-row center">
+            <h2 class="filterflashsale-title">
+              <i class="fa-solid fa-medal img-fluid"></i>
+              Best seller
+            </h2>                
+          </div>
+          
+          <div class="btnViewall">
+            <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+          </div>
+
+      </div>
+      <!-- Best seller end-->
+      
+      <div class="row">
+        <div class="col-12 col-lg">
+          <div class="products-con-common">
+
+            <!-- Placeholder for Bestseller products -->
+            <% // Sort products by quantity in ascending order
+            const bestsellerProducts = products.sort((a, b) => a.quantity - b.quantity).slice(0, 5);
+            if (bestsellerProducts.length === 0) { %>
+              <p>No bestseller products available</p>
+            <% } else { %>
+              <% bestsellerProducts.forEach(product => { %>
+                <div class="products-item">
+                  <div class="products-img position-relative">
+                    <a href="/product-page">
+                    <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
+                </a>
+                  </div>
+                  <div class="products-detail">
+                    <p><span><%= product.product_name %></span></p>
+                    <p><%= product.category_type %></p>
+                  </div>
+                  <!-- Other product details -->
+                  <div class="products-price">
+                    <div class="original">
+                      <p><span class=""><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
+                    </div>
+                  </div>
+                  <div class="products-buy">
+                    <div>
+                      <button class="addbag-b"><p>add to bag</p></button>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
+
+
+          </div>             
+        </div>
+
+      </div>
+    </div>
+    <!--Best seller container end-->
+
+    <!-- hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr-->
+    <!--New Release container start-->
+    <!--New Release start-->
+    <div class="containers wraper" id="New Release" style="margin-top: 100px; margin-bottom: 0px;">
+    
+      <div class="bannerTopic">
+        <div class="d-flex flex-column flex-lg-row center">
+            <h2 class="filterflashsale-title">
+              <i class="fa-solid fa-boxes-packing img-fluid"></i>            
+              New Release
+            </h2>                
+          </div>
+          
+          <div class="btnViewall">
+            <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+          </div>
+
+      </div>
+      <!--New Release end-->
+      
+      <div class="row">
+        <div class="col-12 col-lg">
+          <div class="products-con-common">
+
+            <!-- Placeholder for New Release products -->
+            <% // Sort products by release date in descending order (newest first)
+            const newReleaseProducts = products.sort((a, b) => new Date(b.public_date) - new Date(a.public_date)).slice(0, 5);
+            if (newReleaseProducts.length === 0) { %>
+              <p>No new release products available</p>
+            <% } else { %>
+              <% newReleaseProducts.forEach(product => { %>
+                <div class="products-item">
+                  <div class="products-img position-relative">
+                    <a href="/product-page">
+                    <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
+                    </a>
+                  </div>
+                  <div class="products-detail">
+                    <p><span><%= product.product_name %></span></p>
+                    <p><%= product.category_type %></p>
+                  </div>
+                  <!-- Other product details -->
+                  <div class="products-price">
+                    <div class="original">
+                      <p><span class=""><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
+                    </div>
+                  </div>
+                  <div class="products-buy">
+                    <div>
+                      <button class="addbag-b"><p>add to bag</p></button>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
+
+
+          </div>             
+        </div>
+
+      </div>
+    </div>
+    <!--New Release container end-->
+
+    <!--Highlight container start-->
+    <!--Highlight start-->
+    <div class="containers wraper" id="Highlight" style="margin-top: 100px; margin-bottom: 0px;">
+    
+      <div class="bannerTopic">
+        <div class="d-flex flex-column flex-lg-row center">
+            <h2 class="filterflashsale-title">
+              <i class="fa-solid fa-star img-fluid"></i>
+              Highlight
+            </h2>                
+          </div>
+          
+          <div class="btnViewall">
+            <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+          </div>
+
+      </div>
+      <!-- Highlight end-->
+      
+      <div class="row">
+        <div class="col-12 col-lg">
+          <div class="products-con-common">
+
+            <!-- Placeholder for Highlight products -->
+            <% // Sort products by star rating in descending order (highest first)
+            const highlightProducts = products.sort((a, b) => b.star - a.star).slice(0, 5);
+            if (highlightProducts.length === 0) { %>
+              <p>No highlight products available</p>
+            <% } else { %>
+              <% highlightProducts.forEach(product => { %>
+                <div class="products-item">
+                  <div class="products-img position-relative">
+                    <a href="/product-page">
+                    <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
+                  </a>
+                  </div>
+                  <div class="products-detail">
+                    <p><span><%= product.product_name %></span></p>
+                    <p><%= product.category_type %></p>
+                  </div>
+                  <!-- Other product details -->
+                  <div class="products-price">
+                    <div class="original">
+                      <p><span class=""><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
+                    </div>
+                  </div>
+                  <div class="products-buy">
+                    <div>
+                      <button class="addbag-b"><p>add to bag</p></button>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
+
+
+          </div>             
+        </div>
+
+      </div>
+    </div>
+    <!--Highlight container end-->
+
+    <!--Coming Soon container start-->
+    <!-- Coming Soon start-->
+    <div class="containers wraper" id="Coming Soon" style="margin-top: 100px; margin-bottom: 0px;">
+    
+      <div class="bannerTopic">
+        <div class="d-flex flex-column flex-lg-row center">
+            <h2 class="filterflashsale-title">
+              <i class="fa-solid fa-clock img-fluid"></i>
+              Coming Soon
+            </h2>                
+          </div>
+          
+          <div class="btnViewall">
+            <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+          </div>
+
+      </div>
+      <!-- Coming Soon end-->
+      
+      <div class="row">
+        <div class="col-12 col-lg">
+          <div class="products-con-common">
+
+            <!-- Placeholder for Coming Soon products -->
+            <% // Filter products with a release date later than March 20, 2024
+            const comingSoonProducts = products.filter(product => new Date(product.public_date) > new Date('2024-06-20')).slice(0, 5);
+            if (comingSoonProducts.length === 0) { %>
+              <p>No coming soon products available</p>
+            <% } else { %>
+              <% comingSoonProducts.forEach(product => { %>
+                <div class="products-item">
+                  <div class="products-img position-relative">
+                    <a href="/product-page">
+                    <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
+                  </a>
+                  </div>
+                  <div class="products-detail">
+                    <p><span><%= product.product_name %></span></p>
+                    <p><%= product.category_type %></p>
+                  </div>
+                  <!-- Other product details -->
+                  <div class="products-price">
+                    <div class="original">
+                      <p><span class=""><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
+                    </div>
+                  </div>
+                  <div class="products-buy">
+                    <div>
+                      <button class="addbag-b"><p>add to bag</p></button>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
+
+
+          </div>             
+        </div>
+
+      </div>
+    </div>
+    <!--Coming Soon container end-->
+
+<%- include('../templates/user-footer') %>
+  
+    <script src="js/home.js"></script>
+      <script
+        src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"
+      ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

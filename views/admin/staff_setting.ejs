@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Setting</title>
+    <link rel="stylesheet" href="css/Staff-setting.css">
+    <link rel="stylesheet" href="css/Admin-nav-bar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    
+    <%- include('../templates/nav-bar-admin-setting') %>
+
+    <!-- NavBar -->
+    <!-- preview Nav -->
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="Welcome-Staff">
+            <h1>Welcome</h1> 
+            <h1>Admin, Name</h1>
+        </div>
+        
+        <!-- Main Content Setting -->
+        <div class="Setting-content">
+            <!-- Main Content Right -->
+            <div class="left-content">
+                <div class="Setting-Profile">
+                    <img src="imgAssets/Profile.svg">
+                    <h1 class="Staff-name">Name</h1>
+                    <button id="Staff-logout">Log Out</button>
+                </div>
+                <div class="history">
+                    <div class="heading">
+                        <h2>History</h2>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Main Content Right -->
+
+            <!-- Main Content Left -->
+            <div class="right-content">
+
+                <div class="account-menu">
+                    <h2 class="head2">Profile Details</h2>
+                </div>
+                <div class="account-menu">
+                    <h2>Name</h2>
+                    <button>Edit</button>
+                </div>
+                <div class="account-menu">
+                    <h2>Email</h2>
+                    <button>Update</button>
+                </div>
+                <div class="account-menu">
+                    <h2>Number</h2>
+                    <button>Edit</button>
+                </div>
+                <div class="account-menu">
+                    <h2>Password</h2>
+                    <button>Change</button>
+                </div>
+
+            </div>
+            <!-- Main Content Left -->
+
+        </div>
+    </div>
+
+    <!-- End Main Content -->
+    <%- include('../templates/footer') %>

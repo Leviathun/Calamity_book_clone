@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://kit.fontawesome.com/451145afdd.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="css/Login.css">
+    <link rel="stylesheet" href="css/Home.css" />
+</head>
+<body>
+    
+    <%- include('../templates/nav-bar-user') %>
+
+    <div id="container">
+        <h1 class="h1-text">Welcome</h1>
+        <div id="form">
+            <div class="button">
+                <a href="/login"><button type="button LogInButton" id="LogInButton">Log in</button></a>
+                <a href="/registration"><button type="button SignInButton" id="SignInButton">Sign up</button></a>
+            </div>
+            <br>
+
+            <label for="Email">Email</label><br>
+            <input type="email" name="email" id="inputEmail" placeholder="Enter Your Email"> 
+            <br>
+
+            <label for="Password">Password</label><br>
+            <input type="password" name="password" id="inputPassword" placeholder="Enter Your Password">
+            <br>
+            <div id="submitButton">
+                <a href="/account-info"><input type="submit" value="Log in"></a>
+            </div>
+            
+            <div class="or">
+                <hr>
+                <P>or</P>
+                <hr>
+            </div>
+            
+            <div class="LogoLink">
+                <a href="https://www.google.co.uk/" target="_blank"><img src="imgAssets/googleLogo.svg" alt="google" class="LogoLink"></a>
+                <a href="https://www.facebook.com/" target="_blank"><img src="imgAssets/facebookLogo.svg" alt="facebook" class="LogoLink"></a>
+            </div>
+
+            <div class="underLogo">
+                <a href="#">Forgot Password?</a>
+                <p>Do not have an account? <a href="/registration">Sign up now</a></p>
+            </div>
+            
+    
+        </div>
+    </div>
+
+    <footer>
+        <div>
+            <a href="/home">&#60;Back to shopping</a>
+        </div>
+        <div>
+            <a href="/staff-login">
+                <img class="LogoLink2" src="imgAssets/AdminLogo.svg" alt="LogoAdmin">Admin
+            </a>
+        </div>
+    </footer>
+    <script src="js/home.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"
+  ></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+  integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+  crossorigin="anonymous"
+></script>
+</body>
+</html>

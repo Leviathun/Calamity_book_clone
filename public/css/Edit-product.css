@@ -1,0 +1,96 @@
+.container {
+    margin: 20px;
+    padding: 20px;
+    position: relative; /* Set position to relative for absolute positioning of children */
+}
+
+h1 {
+    text-align: left;
+}
+
+.context-box {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 100%; /* Change width to fit mobile screen */
+    height: auto; /* Change height to auto for responsiveness */
+    padding: 20px; /* Add padding for better spacing */
+    position: relative; /* Set position to relative for absolute positioning of children */
+}
+
+.context-box h2 {
+    margin-top: 0;
+}
+
+.context-box input[type="file"] {
+    margin-bottom: 10px;
+}
+
+.box1 {
+    margin-top: 20px; /* Adjust top margin for better spacing */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Change width to fit mobile screen */
+    height: 200px; /* Adjust height for better fit */
+    border: 1px solid #ccc;
+    padding: 20px; /* Add padding for better spacing */
+}
+
+.box2 {
+    margin-top: 20px; /* Adjust top margin for better spacing */
+}
+
+.boxs1 {
+    width: 60%;
+    margin-top: 10px; /* Adjust top margin for better spacing */
+}
+
+#boxss1 {
+    width: 100%; /* Change width to fit mobile screen */
+    height: 40px; /* Adjust height for better fit */
+    margin-bottom: 10px; /* Adjust bottom margin for better spacing */
+}
+
+#boxs2 {
+    width: 100%; /* Change width to fit mobile screen */
+    height: 40px; /* Adjust height for better fit */
+    margin-bottom: 10px; /* Adjust bottom margin for better spacing */
+}
+
+.description {
+    margin-top: 20px; /* Adjust top margin for better spacing */
+}
+
+#description {
+    width: 100%; /* Change width to fit mobile screen */
+    height: 100px; /* Adjust height for better fit */
+    margin-bottom: 10px; /* Adjust bottom margin for better spacing */
+}
+
+.confirm-button {
+    width: 15%; /* Set width to auto to fit content */
+    height: 30px; /* Adjust height for better fit */
+    margin-left: 73%;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.additional-box {
+    margin-left: 10%;
+    width: 80%; /* Change width to fit mobile screen */
+    height: auto; /* Change height to auto for responsiveness */
+    margin-top: 20px; /* Adjust top margin for better spacing */
+    padding:20px;
+    text-align: center; /* Align content in the center horizontally */
+    border-top: 1px solid black;
+}
+
+.additional-box p {
+    font-size: 14px; /* Adjust font size for better fit */
+    margin: 0; /* Remove default margin */
+}

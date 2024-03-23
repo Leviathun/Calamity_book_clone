@@ -1,0 +1,181 @@
+/* Body */
+.container2 {
+    margin-left: 5%;
+    padding-top: 3%;
+    padding-left: 3%;
+    padding-right: 3%;
+    position: relative;
+}
+#navbar2 {
+    width: 80%;
+    border-right: 1px solid black;
+}
+#info {
+    width: 80%;
+    font-size: 30px;
+    margin-bottom: 70px;
+    border-bottom: 1px solid black;
+}
+/* Nav-Bar */
+.accountin {
+    width: auto;
+    
+}
+
+/* Side-Bar */
+.sidebar {
+    float: left;
+}
+
+@media only screen and (max-width: 576px) {
+    
+    div.heading {
+        text-align: center;
+    }
+
+}
+
+.navbar-collapse li a {
+    color: #000;
+}
+
+.sidebar {
+    padding: 0 10px;
+    margin-left: auto;
+    margin-top: 15%;
+}
+
+/* Content */
+@media only screen and (min-width: 426px) and (max-width: 768px) {
+
+    .account-menu button {
+        width:35% !important;
+    }
+
+}
+
+.content-header {
+    text-align: center;
+    margin: 0 10%;
+    padding-top: 6%;
+    font-size: 1rem;
+}
+
+.info-container {
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+}
+
+.account-menu {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 15px; 
+    margin: 0 10%;
+    font-size: 1em;
+}
+
+.account-menu .img {
+    flex-wrap: wrap;
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+    background-color: lightgrey;
+    border-radius: 100%;
+    text-align: center;
+}
+
+.account-menu img {
+    width: 50px;
+    height: 50px;
+    padding-top: 7px;
+
+}
+
+.account-menu:first-child h2{
+    margin-top: 0;
+}
+
+.account-menu button {
+    margin-top: 2%;
+    width: 30%;
+    height: 35px;
+    border: none;
+}
+.account-menu button:hover {
+    background-color: aqua;
+    color: white;
+}
+
+.context-box {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 100%; /* Change width to fit mobile screen */
+    height: auto; /* Change height to auto for responsiveness */
+    padding: 20px; /* Add padding for better spacing */
+    position: relative; /* Set position to relative for absolute positioning of children */
+}
+
+.context-box h2 {
+    margin-top: 0;
+}
+
+.context-box input[type="file"] {
+    margin-bottom: 10px;
+}
+
+@media only screen and (min-width: 577px) and (max-width: 1100px) {
+
+    div.form {
+        height: auto !important;
+        padding-bottom: 10%;
+    }
+
+    div.form div {
+        margin: 10% 0 !important;
+    }
+
+}
+
+
+.content-header {
+    text-align: center;
+    margin: 0 10%;
+    padding-top: 6%;
+    font-size: 1rem;
+}
+
+div.form {
+    border: black solid 1px;
+    margin: 0 15%;
+    text-align: center;
+    height: 70vh;
+}
+
+div.form div {
+    margin: 5% 0;
+}
+
+.input2 {
+    border: none;
+    background-color: lightgray;
+    color: black;
+    width: 70%;
+    height: 35px;
+}
+
+div.button button {
+    border: none;
+    background-color: lightgray;
+    color: black;
+    width: auto;
+    padding: 5px 10px;
+    font-size: 1.5rem;
+}
+
+div.button button:hover {
+    background-color: aqua;
+    color: white;
+}

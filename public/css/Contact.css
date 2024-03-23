@@ -1,0 +1,57 @@
+:root {
+    --blue: #9ab3f5;
+    --white: white;
+    --purple: purple;
+    --shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+  
+    --navy: #265073;
+    --teal: #2d9596;
+    --lightteal: #9ad0c2;
+    --sage: #f1fada;
+}
+.top-contact {
+    border: 1px solid black;
+}
+.info {
+    margin: 10px auto;
+    height: 400px;
+    width: 80%;
+}
+.info h4 {
+    padding: 10px;
+    font-size: 30px;
+}
+/*Thun API */
+/*AIzaSyAo0v1Gwk0scXPfXZNWOviHih1j-652V9w*/
+.talk {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 300px;
+    margin-top: 10px;
+}
+.contact-inputs {
+    margin: 10px;
+    padding: 10px;
+    width: 500px;
+    height: 50px;
+    outline: none;
+    font-weight: 500;
+    color: var(--navy)
+}
+textarea.contact-inputs {
+    padding-bottom: 100px;
+    max-height: 150px;
+}
+button.submit {
+    border-radius: 20px;
+    width: 100px;
+    margin-right: 300px;
+}
+
+@media (max-width: 768px) {
+   iframe{
+    margin-top: 10px;
+    width: 550px;
+   } 
+}

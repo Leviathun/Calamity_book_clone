@@ -1,0 +1,147 @@
+/* Nav-Bar */
+
+/* Nav-Bar */
+
+
+
+/* Main Content */
+div.container {
+    margin: 5% auto;
+}
+
+div.container .Welcome-Staff {
+    display: flex;
+}
+
+div.container .Welcome-Staff h1 {
+    padding-right: 5%;
+    margin-bottom: 2%;
+}
+
+@media only screen and (max-width: 768px) {
+    div.container .Welcome-Staff {
+        flex-direction: column;
+    }
+}
+
+div.Setting-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media only screen and (max-width: 500px) {
+
+    div.Setting-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Main Content Left*/
+    div.Setting-content .left-content {
+        width: 100% !important;
+    }
+
+    /* Main Content Right*/
+    div.Setting-content .right-content {
+        width: 100% !important;
+    }
+
+    div.left-content .Setting-Profile button {
+        width: 50% !important;
+    
+    }
+    
+
+}
+
+/* Main Content */
+
+
+
+/* Main Content Left*/
+div.Setting-content .left-content {
+    width: 48%;
+
+}
+
+div.left-content .Setting-Profile {
+    border: 1px solid black;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5%;
+
+}
+
+div.left-content .Setting-Profile img {
+    width: 50%;
+    height: 50%;
+    padding-bottom: 5%;
+
+}
+
+div.left-content .Setting-Profile button {
+    margin-top: 2%;
+    width: 30%;
+    height: 50px;
+    border-radius: 100px;
+    border: none;
+    background-color: lightgray;
+    font-size: 1.5rem;
+
+}
+
+div.left-content .history {
+    border: 1px solid black;
+    height: 30vh;
+    padding-bottom: 2%;
+    margin-bottom: 5%;
+    overflow: scroll;
+
+}
+
+div.left-content .history .heading {
+    border: 1px solid black;
+
+}
+/* Main Content Left*/
+
+
+
+/* Main Content Right*/
+div.Setting-content .right-content {
+    width: 48%;
+
+}
+
+.account-menu {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 25px 10px; 
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.account-menu h2 {
+    padding-left: 3%;
+}
+
+.account-menu .head2 {
+    font-weight: bolder;
+}
+
+.account-menu button {
+    margin-top: 2%;
+    width: 30%;
+    height: 35px;
+    border: none;
+}
+
+.account-menu button:hover {
+    background-color: aqua;
+    color: white;
+}
+/* Main Content Right*/

@@ -1,0 +1,83 @@
+:root {
+    --blue: #9ab3f5;
+    --white: white;
+    --purple: purple;
+    --shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+  
+    --navy: #265073;
+    --teal: #2d9596;
+    --lightteal: #9ad0c2;
+    --sage: #f1fada;
+  }
+.Product-info {
+    font-size: 30px;
+    margin-bottom: 50px;
+}
+.Product-info h4 {
+    font-size: 50px;
+}
+.products-price{
+    padding: 0;
+}
+.discount {
+    font-size: 50px; 
+}
+.original .line-discount {
+    font-size: 40px; 
+}
+.btn-secondary {
+    margin-top: 130px;
+    background-color: var(--navy);
+    padding: 10px;
+    font-size: 30px;
+    width: 300px;
+    color: var(--sage);
+}
+input::placeholder {
+    color: var(--sage);
+} 
+table {
+    width: 100%;
+    border: 2px solid var(--navy);
+    border-collapse: collapse;
+}
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 30px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+
+@media (max-width: 768px) {
+    .Product-img img {
+       width: 300px;
+       height: 300px;
+    }
+    .Product-info {
+        font-size: 15px;
+        margin-bottom: 50px;
+    }
+    .Product-info h4 {
+        font-size: 25px;
+    }
+    .products-price{
+        padding: 0;
+    }
+    .discount {
+        font-size: 25px; 
+    }
+    .original .line-discount {
+        font-size: 20px; 
+    }
+    .btn-secondary {
+        margin-top: 10px;
+        background-color: var(--navy);
+        padding: px;
+        font-size: 15px;
+        width: 150px;
+        color: var(--sage);
+    }
+}

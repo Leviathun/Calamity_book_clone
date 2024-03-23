@@ -1,0 +1,89 @@
+.manage-box {
+    width: 880px;
+    height: 201px;
+    margin-top: 83px;
+    margin-left: 260px;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ccc;
+}
+
+.manage-box > div {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.manage-product, .manage-category {
+    font-family: sans-serif;
+    font-size: 40px;
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
+}
+
+.manage-product img, .manage-category img {
+    width: 50px;
+    height: auto;
+    margin-left: 20px;
+}
+
+.manage-product span, .manage-category span {
+    margin-left: 10px;
+}
+
+.additional-box {
+    margin-left: 10%;
+    width: 80%; /* Change width to fit mobile screen */
+    height: auto; /* Change height to auto for responsiveness */
+    margin-top: 20px; /* Adjust top margin for better spacing */
+    padding:20px;
+    text-align: center; /* Align content in the center horizontally */
+    border-top: 1px solid black;
+}
+
+.additional-box p {
+    font-size: 14px; /* Adjust font size for better fit */
+    margin: 0; /* Remove default margin */
+}
+
+/* Media Queries for responsiveness */
+@media only screen and (max-width: 1200px) {
+    .manage-box {
+        width: 80%;
+        margin-left: 10%;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .manage-box {
+        width: 90%;
+        margin-left: 5%;
+        margin-top: 50px; /* Adjust top margin for better spacing */
+    }
+}
+
+@media only screen and (max-width: 576px) {
+    .manage-box {
+        width: 95%;
+        margin-left: 2.5%;
+    }
+
+    .manage-product, .manage-category {
+        font-size: 30px;
+    }
+
+    .manage-product img, .manage-category img {
+        width: 40px;
+        margin-left: 10px;
+    }
+
+    .manage-product span, .manage-category span {
+        margin-left: 5px;
+    }
+}

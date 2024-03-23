@@ -1,0 +1,143 @@
+:root {
+    --blue: #9ab3f5;
+    --white: white;
+    --purple: purple;
+    --shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+  
+    --navy: #265073;
+    --teal: #2d9596;
+    --lightteal: #9ad0c2;
+    --sage: #f1fada;
+}
+.borderOrder {
+    border: 1px solid var(--navy);
+    position: sticky;
+    top: 25px;
+}
+.borderCart {
+    border: 1px solid var(--navy);
+    margin: 10px 0;
+    justify-content: space-between; 
+}
+.contentleft{
+    width: 70%;
+}
+
+.morespace {
+    padding: 10px 30px;
+}
+#addremove {
+    border: none;
+    background-color: var(--white);
+    color: grey;
+}
+button#addremove:hover {
+    color: red;
+}
+
+
+#numberProCart {
+    padding-left: 10px;
+    width: 100px;
+}
+.contentright {
+    margin-left: 5rem;
+    width: 30%;
+    justify-content: end;
+}
+.updateCart button{
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 5px;
+    margin-top: 50px; 
+    border: none; 
+}
+#Checkout {
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 10px 150px;
+    margin: 10px 0;
+    background-color: var(--sage);
+}
+.remove {
+    margin-top: 60px;
+}
+.add {
+    margin-top: 60px;
+}
+
+
+@media (max-width: 768px) {
+    #miniImg {
+        width: 100px;
+        height: 100%;
+    }
+    .mini {
+        font-size: 1rem;
+    }
+    .minih2 {
+        font-size: 1.5rem;
+    }
+    .minih1 {
+        font-size: 1.3rem;
+    }
+    .morespace {
+        padding: 10px 0px;
+    }
+    #addremove {
+        font-size: 0.8rem;
+        border: none;
+        background-color: var(--white);
+        color: grey;
+    }
+    button#addremove:hover {
+        color: red;
+    }
+    .remove {
+        margin-top: 50px;
+    }
+ 
+    #numberProCart {
+        padding-left: 10px;
+        width: 70px;
+    }
+
+
+    .contentright {
+        margin-left: 3rem;
+        width: 30%;
+        font-size: 20px;
+    }
+    .updateCart button{
+        font-size: 0.7rem;
+        font-weight: 500;
+        padding: px;
+        margin-top: 50px; 
+        border: none; 
+    }
+    #Checkout {
+        color: var(--navy);
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 10px 50px;
+        margin: 10px 0;
+        background-color: var(--sage);
+    }
+    
+   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

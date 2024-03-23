@@ -1,0 +1,151 @@
+<!--nav bar top start-->
+<nav class="navbar navbar-expand-lg">
+      
+    <div class="container">
+      <div class="d-flex justify-content-end align-items-center">
+        <a class="navbar-brand" href="/home">
+          <img src="../imgAssets/Logo.png" />
+        </a>
+      </div>
+
+
+      <div class="d-flex justify-content-end align-items-center">
+
+        <div>
+          <form role="search">
+            <!--Search bar start-->
+            <div class="search-bar">
+              <!--Dropdown start-->
+              <div class="dropdown">
+                <div id="drop-text" class="dropdown-text">
+                  <span id="span">All category</span>
+                  <i id="icon" class="fa-solid fa-chevron-down"></i>
+                </div>
+
+                <ul id="list-category" class="dropdown-list">
+                  <li class="dropdown-list-item"><a href="/all-category">All category</a></li>
+                  <li class="dropdown-list-item"><a href="/comics">Comics</a></li>
+                  <li class="dropdown-list-item"><a href="/fiction">Fiction & Literature</a></li>
+                  <li class="dropdown-list-item"><a href="/lang">Languages</a></li>
+                  <!--add new category-->
+                  <li class="dropdown-list-item"><a href="#">Unknows</a></li>
+                  
+                </ul>
+              </div>
+              <!--Dropdown start-->
+
+              <!--Search box input start-->
+              <div class="search-box">
+                <input
+                  type="text"
+                  id="search-input"
+                  placeholder="Find your favorite book..."
+                />
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </div>
+              <!--Search box input end-->
+            </div>
+            <!--Search bar end-->
+          </form>
+        </div>
+
+        <!--toggler start-->
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon "></span>
+        </button>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+          
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+
+
+        <div class="navbar-icons d-flex ">
+
+          <div class="nav-item resize ">
+            <a class="nav-link active" aria-current="page" href="/login">
+              <i class="fa-solid fa-user"></i>
+              <br>
+              <p><span class="hide">user</span></p>
+            </a>
+          </div>
+
+          <div class="nav-item resize">
+            <a class="nav-link active" aria-current="page" href="/cart">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <br>
+              <p><span class="hide">cart</span></p>
+            </a>
+          </div>
+          <div class="nav-item resize">
+            <a class="nav-link active" aria-current="page" href="/wishlist">
+              <i class="fa-solid fa-heart"></i>
+              <br>
+              <p><span class="hide">wish list</span></p>
+            </a>
+          </div>
+          <div class="nav-item resize">
+            <a class="nav-link active" aria-current="page" href="/track-order">
+              <i class="fa-solid fa-truck"></i>
+              <br>
+              <p><span class="hide">tacking</span></p>
+            </a>
+          </div>
+        </div>
+       
+
+        <!--hide in desktop but show in moblie-->
+        <ul class="hide">
+          <li class="nav-item-but">
+            <a class="nav-link active" aria-current="page" href="#Flash sale">Promotion</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" aria-current="page" href="#Best seller">Best seller</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" aria-current="page" href="#New Release">New Release</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" aria-current="page" href="#Highlight">Highlight</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" aria-current="page" href="#Coming Soon">Coming Soon</a>
+          </li>
+        </ul>
+        
+      </div>
+    </div>
+   <!--toggler end-->
+  </nav>
+  <!--nav bar top end-->
+  <!--bottom navbar start-->
+  <nav class="navbar navbar-expand-lg bg-bot">
+    <div class="container-fluid">
+    
+      <div class="nav-bot collapse navbar-collapse" id="navbarTogglerDemo01">
+        
+        <ul class="navbar-nav">
+          
+          <li class="nav-item-bot">
+            <a class="nav-link active" aria-current="page" href="#Flash sale"><p>Promotion</p></a>
+          </li>
+          <li class="nav-item-bot">
+            <a class="nav-link active" aria-current="page" href="#Best seller"><p>Best seller</p></a>
+          </li>
+          <li class="nav-item-bot">
+            <a class="nav-link active" aria-current="page" href="#New Release"><p>New Release</p></a>
+          </li>
+          <li class="nav-item-bot">
+            <a class="nav-link active" aria-current="page" href="#Highlight"><p>Highlight</p></a>
+          </li>
+          <li class="nav-item-bot">
+            <a class="nav-link active" aria-current="page" href="#Coming Soon"><p>Coming Soon</p></a>
+          </li>
+
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+  <!--bottom navbar end-->

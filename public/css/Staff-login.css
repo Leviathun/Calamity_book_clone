@@ -1,0 +1,126 @@
+/* Body */
+body {
+    box-sizing: border-box;
+}
+
+/* Link */
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+a:hover {
+    color: red;
+}
+
+/* Nav-bar */
+header {
+    margin: 0;
+    height: 15vh;
+    background-color: aqua;
+}
+
+/* Welcome */
+.h1-text {
+    text-align: center;
+    margin-top: 3%;
+    font-size: 50px;
+}
+
+/* Container */
+div#container {
+    font-size: 20px;
+}
+
+div#form {
+    width: auto;
+    height: auto;
+    border-style: solid;
+    padding-left: 10%;
+    padding-right: 10%;
+    margin: 0 15%;
+}
+
+button {
+    font-size: 1.5rem;
+    padding: 3% 20%;
+    background-color: lightgray;
+}
+
+div.button {
+    text-align: center;
+    margin-top: 4%;
+}
+
+label {
+    font-size: 1.5rem;
+}
+
+input[type="textt"],input[type="password"] {
+    width: 100%;
+    height:45px;
+    margin-bottom: 5%;
+    background-color: lightgray;
+}
+
+div#submitButton {
+    text-align: center;
+    margin-bottom: -5%;
+}
+
+input[type="submit"] {
+    font-size: 1.5rem;
+    width: auto;
+    height: 60px;
+    padding: 0 10%;
+    background-color: lightgray;
+}
+
+div.or {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    margin-top: 50px;
+}
+
+hr {
+    flex: 1;
+    border: none;
+    border-top: 1px solid #000;
+    margin: 0 10px;
+}
+
+img.LogoLink {
+    width: 60px;
+    height: 60px;
+    padding: 1%;
+    background-color: lightgray;
+    border-radius: 100%;
+    margin: 0 7%;  
+}
+
+div.LogoLink {
+    text-align: center;
+    margin-bottom: 5%;
+}
+
+/* Footer */
+footer {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    font-size: 40px;
+}
+
+img.LogoLink2 {
+    width: 60px;
+    height: 60px;
+}
+
+img.LogoLink2:hover {
+    opacity: 70%;
+}
+
+.or {
+    margin-top: 40px;
+}
