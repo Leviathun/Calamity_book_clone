@@ -19,63 +19,69 @@
 <div class="containers wraper" style="margin-top: 50px; margin-bottom: 50px;">
     <div class="row top-contact">
         <div class="col-sm-6 col-lg-6 center">        
-            <!-- Displaying only one product image -->
             <div class="products-item">
                 <div class="products-img position-relative">
-                    <a href="/product-page"> <!-- Anchor tag for navigation -->
-                        <img src="<%= products[0].img_link %>" alt="<%= products[0].product_name %>">
+                    <a href="/product-page?id=<%= product.product_id %>"> 
+                        <img src="<%= product.img_link %>" alt="<%= product.product_name %>" style="max-height: 400px; object-fit: contain;">
                     </a>
+                    <% if (product.percent > 0) { %>
                     <p class="product-label position-absolute">
-                        <span class="line-1"><%= products[0].percent %></span> 
+                        <span class="line-1"><%= product.percent %></span> 
                         <br>
                         <span class="line-2">OFF</span> 
                     </p>
+                    <% } %>
                 </div>
             </div>
         </div>
 
         <div class="col-sm-6 col-lg-6 ">
-            <!-- Product details -->
             <div class="Product-info">
-                <h4 id="product-title"><%= products[0].product_name %></h4>
-                <h4 id="product-item">ID: <%= products[0].product_ID %></h4>
-                <p><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></p>
+                <h4 id="product-title"><%= product.product_name %></h4>
+                <h4 id="product-item">ID: <%= product.product_id %></h4>
+                <p>
+                    <% for(let i=1; i<=5; i++) { %>
+                        <% if (i <= Math.round(product.star)) { %>
+                            <i class="fa-solid fa-star" style="color: gold;"></i>
+                        <% } else { %>
+                            <i class="fa-regular fa-star"></i>
+                        <% } %>
+                    <% } %>
+                    (<%= product.star %>)
+                </p>
                 <div class="products-price">
+                    <% if (product.price_discount && product.price_discount < product.price) { %>
                     <div class="discount">
-                        <p><i class="fa-solid fa-baht-sign"></i><%= products[0].price_discount %></p>
+                        <p><i class="fa-solid fa-baht-sign"></i><%= product.price_discount %></p>
                     </div>
                     <div class="original">
-                        <p><span class="line-discount"><i class="fa-solid fa-baht-sign "></i><%= products[0].price %></span></p>
+                        <p><span class="line-discount"><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
                     </div>
+                    <% } else { %>
+                    <div class="discount">
+                        <p><i class="fa-solid fa-baht-sign"></i><%= product.price %></p>
+                    </div>
+                    <% } %>
                 </div>
-                <h4>Availability : <span id="product-availability">yes</span></h4>
+                <h4>Availability : <span id="product-availability"><%= product.quantity > 0 ? 'In Stock (' + product.quantity + ')' : 'Out of Stock' %></span></h4>
             </div>
 
-            <!-- Quantity and add to cart button -->
-            <div class="d-flex">
+            <div class="d-flex mt-4">
                 <div>
                     <div class="dropdown-center"> 
-                        <input class="btn btn-secondary" type="number" name="numberQuantity" id="product-quantity" placeholder="Quantity:">                       
+                        <input class="btn btn-secondary" type="number" id="product-quantity-input" value="1" min="1" max="<%= product.quantity %>" style="width: 100px;">                       
                     </div>
                 </div>
                 <div class="ms-5">
-                    <button class="btn btn-secondary" type="submit" id="add-to-cart-btn">Add to cart</button>
+                    <button class="btn btn-secondary" type="button" id="add-to-cart-btn" onclick="addSpecificQuantityToCart(<%= product.product_id %>)">Add to cart</button>
+                </div>
+                <div class="ms-3">
+                    <button class="btn btn-outline-danger" type="button" onclick="addToWishlist(<%= product.product_id %>)"><i class="fa-solid fa-heart"></i> Wishlist</button>
                 </div>
             </div>
         </div>             
     </div>
 
-    <!-- Description -->
-    <div class="flashsale mt-5">
-        <div class="d-flex flex-column flex-lg-row center">
-            <h2 class="filterflashsale-title">Description</h2>                
-        </div> 
-    </div>
-
-    <div class="row top-contact">
-        <p id="product-description"><%= products[0].description %></p>
-    </div>
-    
     <!-- Details -->
     <div class="flashsale mt-5">
         <div class="d-flex flex-column flex-lg-row center">
@@ -84,22 +90,24 @@
     </div>
 
     <div class="row top-contact">
-        <table>
+        <table class="table">
             <tr>
                 <th>Title</th>
-                <td id="product-name"><%= products[0].product_name %></td>
-            </tr>
-            <tr>
-                <th>Author</th>
-                <td id="product-author"><%= products[0].product_author %></td>
-            </tr>
-            <tr>
-                <th>Publication Date</th>
-                <td id="product-publication-date"><%= products[0].public_date %></td>
+                <td id="product-name"><%= product.product_name %></td>
             </tr>
             <tr>
                 <th>Category</th>
-                <td id="product-category"><%= products[0].category_type %></td>
+                <td id="product-category"><%= product.category_type %></td>
+            </tr>
+            <tr>
+                <th>Publication Date</th>
+                <td id="product-publication-date">
+                    <% if (product.public_date) { %>
+                        <%= new Date(product.public_date).toLocaleDateString() %>
+                    <% } else { %>
+                        -
+                    <% } %>
+                </td>
             </tr>
         </table>
     </div>
@@ -111,5 +119,51 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 
+<script>
+async function addSpecificQuantityToCart(productId) {
+    const qtyInput = document.getElementById('product-quantity-input');
+    const quantity = parseInt(qtyInput.value) || 1;
+    
+    try {
+        const response = await fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId, quantity: quantity })
+        });
+        const result = await response.json();
+        if (response.status === 401) {
+            alert(result.message);
+            window.location.href = '/login';
+        } else if (result.success) {
+            alert(result.message);
+        } else {
+            alert('Failed: ' + result.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error adding to cart');
+    }
+}
+
+async function addToWishlist(productId) {
+    try {
+        const response = await fetch('/wishlist/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId })
+        });
+        const result = await response.json();
+        if (response.status === 401) {
+            alert(result.message);
+            window.location.href = '/login';
+        } else {
+            alert(result.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error adding to wishlist');
+    }
+}
+</script>
 </body>
 </html>
