@@ -117,7 +117,7 @@
               <% filteredProducts.forEach(product => { %>
                 <div class="products-item">
                   <div class="products-img position-relative">
-                    <a href="/product-page">
+                    <a href="/product-page?id=<%= product.product_id %>">
                     <img src="<%= product.img_url %>" alt="<%= product.product_name %>" >
                     </a>
                     <p class="product-label position-absolute">
@@ -189,7 +189,7 @@
               <% bestsellerProducts.forEach(product => { %>
                 <div class="products-item">
                   <div class="products-img position-relative">
-                    <a href="/product-page">
+                    <a href="/product-page?id=<%= product.product_id %>">
                     <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                 </a>
                   </div>
@@ -253,7 +253,7 @@
               <% newReleaseProducts.forEach(product => { %>
                 <div class="products-item">
                   <div class="products-img position-relative">
-                    <a href="/product-page">
+                    <a href="/product-page?id=<%= product.product_id %>">
                     <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                     </a>
                   </div>
@@ -316,7 +316,7 @@
               <% highlightProducts.forEach(product => { %>
                 <div class="products-item">
                   <div class="products-img position-relative">
-                    <a href="/product-page">
+                    <a href="/product-page?id=<%= product.product_id %>">
                     <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                   </a>
                   </div>
@@ -379,7 +379,7 @@
               <% comingSoonProducts.forEach(product => { %>
                 <div class="products-item">
                   <div class="products-img position-relative">
-                    <a href="/product-page">
+                    <a href="/product-page?id=<%= product.product_id %>">
                     <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                   </a>
                   </div>

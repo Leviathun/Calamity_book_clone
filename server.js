@@ -225,54 +225,117 @@ app.get('/all-category', (req, res) => {
 
 //go to cart-page
 app.get('/cart', (req, res) => {
-    res.render('user/cart_page');
+    if (!req.session.user) {
+        return res.render('user/cart_page', { cartItems: [], subtotal: 0 });
+    }
+
+    const userId = req.session.user.id;
+    const query = `
+        SELECT c.cart_id, c.quantity, p.product_id, p.product_name, p.price, p.price_discount, p.img_link
+        FROM shopping_cart c
+        JOIN product p ON c.product_id = p.product_id
+        WHERE c.user_id = ?
+    `;
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching cart:', err);
+            return res.render('user/cart_page', { cartItems: [], subtotal: 0 });
+        }
+
+        let subtotal = 0;
+        results.forEach(item => {
+            const itemPrice = item.price_discount || item.price;
+            subtotal += itemPrice * item.quantity;
+        });
+
+        res.render('user/cart_page', { cartItems: results, subtotal: subtotal });
+    });
+});
+
+app.post('/cart/remove', (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const { cart_id } = req.body;
+    db.query('DELETE FROM shopping_cart WHERE cart_id = ? AND user_id = ?', [cart_id, req.session.user.id], (err) => {
+        if (err) return res.status(500).json({ success: false, message: 'Database error' });
+        res.json({ success: true, message: 'Item removed' });
+    });
+});
+
+app.post('/cart/update', (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const { cart_id, quantity } = req.body;
+    db.query('UPDATE shopping_cart SET quantity = ? WHERE cart_id = ? AND user_id = ?', [quantity, cart_id, req.session.user.id], (err) => {
+        if (err) return res.status(500).json({ success: false, message: 'Database error' });
+        res.json({ success: true, message: 'Quantity updated' });
+    });
 });
 
 // Add to Cart API
 app.post('/cart/add', (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ success: false, message: 'Please login first' });
-    }
-    const { product_id } = req.body;
-    const user_id = req.session.user.id;
-
-    db.query('SELECT * FROM shopping_cart WHERE user_id = ? AND product_id = ?', [user_id, product_id], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: 'Database error' });
-        
-        if (results.length > 0) {
-            db.query('UPDATE shopping_cart SET quantity = quantity + 1 WHERE cart_id = ?', [results[0].cart_id], (err2) => {
-                if (err2) return res.status(500).json({ success: false, message: 'Database error' });
-                res.json({ success: true, message: 'Product quantity updated in your cart!' });
-            });
-        } else {
-            db.query('INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, 1)', [user_id, product_id], (err3) => {
-                if (err3) return res.status(500).json({ success: false, message: 'Database error' });
-                res.json({ success: true, message: 'Product added to your cart!' });
-            });
+    try {
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ success: false, message: 'Please login first' });
         }
-    });
+        const { product_id, quantity = 1 } = req.body;
+        const addQty = parseInt(quantity, 10) || 1;
+        if (!product_id) {
+            return res.status(400).json({ success: false, message: 'Invalid product ID. Product ID is missing.' });
+        }
+        const user_id = req.session.user.id;
+
+        db.query('SELECT * FROM shopping_cart WHERE user_id = ? AND product_id = ?', [user_id, product_id], (err, results) => {
+            if (err) {
+                console.error('DB Error in SELECT cart:', err);
+                return res.status(500).json({ success: false, message: 'Database error' });
+            }
+            
+            if (results.length > 0) {
+                db.query('UPDATE shopping_cart SET quantity = quantity + ? WHERE cart_id = ?', [addQty, results[0].cart_id], (err2) => {
+                    if (err2) return res.status(500).json({ success: false, message: 'Database error' });
+                    res.json({ success: true, message: 'Product quantity updated in your cart!' });
+                });
+            } else {
+                db.query('INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, ?)', [user_id, product_id, addQty], (err3) => {
+                    if (err3) return res.status(500).json({ success: false, message: 'Database error' });
+                    res.json({ success: true, message: 'Product added to your cart!' });
+                });
+            }
+        });
+    } catch (e) {
+        console.error('Unexpected error in /cart/add:', e);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
 // Add to Wishlist API
 app.post('/wishlist/add', (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ success: false, message: 'Please login first' });
-    }
-    const { product_id } = req.body;
-    const user_id = req.session.user.id;
-
-    db.query('SELECT * FROM wishlist WHERE user_id = ? AND product_id = ?', [user_id, product_id], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: 'Database error' });
-        
-        if (results.length > 0) {
-            res.json({ success: true, message: 'Product is already in your wishlist!' });
-        } else {
-            db.query('INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)', [user_id, product_id], (err3) => {
-                if (err3) return res.status(500).json({ success: false, message: 'Database error' });
-                res.json({ success: true, message: 'Product added to your wishlist!' });
-            });
+    try {
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ success: false, message: 'Please login first' });
         }
-    });
+        const { product_id } = req.body;
+        if (!product_id) {
+            return res.status(400).json({ success: false, message: 'Invalid product ID' });
+        }
+        const user_id = req.session.user.id;
+
+        db.query('SELECT * FROM wishlist WHERE user_id = ? AND product_id = ?', [user_id, product_id], (err, results) => {
+            if (err) return res.status(500).json({ success: false, message: 'Database error' });
+            
+            if (results.length > 0) {
+                res.json({ success: true, message: 'Product is already in your wishlist!' });
+            } else {
+                db.query('INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)', [user_id, product_id], (err3) => {
+                    if (err3) return res.status(500).json({ success: false, message: 'Database error' });
+                    res.json({ success: true, message: 'Product added to your wishlist!' });
+                });
+            }
+        });
+    } catch (e) {
+        console.error('Unexpected error in /wishlist/add:', e);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
 //go to comics
@@ -326,7 +389,17 @@ app.post('/login', (req, res) => {
 
 //go to product-page
 app.get('/product-page', (req, res) => {
-    res.render('user/product_page');
+    const productId = req.query.id;
+    if (!productId) {
+        return res.redirect('/home');
+    }
+    db.query('SELECT * FROM product WHERE product_id = ?', [productId], (err, results) => {
+        if (err || results.length === 0) {
+            console.error('Error fetching product:', err);
+            return res.redirect('/home');
+        }
+        res.render('user/product_page', { product: results[0] });
+    });
 });
 
 //go to registration

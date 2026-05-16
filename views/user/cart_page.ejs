@@ -46,113 +46,45 @@
   
                 </div>
 
-                <!--Product cart start-->
-                <div class="row active">
-
-                    <div class="d-flex borderCart" >
-                        <div>
-                            <img src="/public/ImgAssets/Logo.png" alt="" id="miniImg" width="200px" height="100%">
+                <% if (cartItems && cartItems.length > 0) { %>
+                    <% cartItems.forEach(item => { %>
+                        <!--Product cart start-->
+                        <div class="row active" id="cart-item-<%= item.cart_id %>">
+                            <div class="d-flex borderCart" >
+                                <div>
+                                    <img src="<%= item.img_link %>" alt="<%= item.product_name %>" id="miniImg" width="200px" style="object-fit: cover;">
+                                </div>
+                                <div class="morespace center">
+                                    <div>
+                                        <h3 class="mini"><%= item.product_name %></h3>
+                                        <br>
+                                        <h3 class="mini">item #<%= item.product_id %></h3>
+                                    </div>
+                                    <div class="add">
+                                        <button class="addremove-btn" onclick="addToWishlist(<%= item.product_id %>)"><p><i class="fa-solid fa-heart"></i> add to wishlist</p></button>
+                                    </div>
+                                </div>
+                                <div class="morespace center">
+                                    <div>
+                                        <h3 class="mini">Price : <%= item.price_discount || item.price %> THB </h3>
+                                        <br>
+                                        <input class="mini qty-input" type="number" value="<%= item.quantity %>" min="1" onchange="updateCartItem(<%= item.cart_id %>, this.value)">
+                                    </div>
+                                    <div class="remove">
+                                        <button class="addremove-btn" onclick="removeCartItem(<%= item.cart_id %>)"><p><i class="fa-solid fa-trash"></i> remove</p></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="morespace center">
-                            <div>
-                                <h3 class="mini">Name</h3>
-                                <br>
-                                <h3 class="mini">item #001</h3>
-                            </div>
-                            <div class="add">
-                                <button id="addremove"><p><i class="fa-solid fa-heart"></i> add to wishlist</p></button>
-                            </div>
+                        <!--Shopping cart end-->
+                    <% }); %>
+                <% } else { %>
+                    <div class="row active">
+                        <div class="d-flex borderCart center p-5">
+                            <h3 class="mini">Your cart is empty. <a href="/home">Go Shopping!</a></h3>
                         </div>
-
-                        <div class="morespace center">
-                            <div>
-                                <h3 class="mini">Prince : 150 THB </h3>
-                                <br>
-                                <input class="mini" id="numberProCart" type="number" name="" id="" placeholder="0">
-                            </div>
-                            <div class="remove">
-                                <button id="addremove"><p><i class="fa-solid fa-trash"></i> remove</p></button>
-                            </div>
-                        </div>
-
                     </div>
-        
-                </div>
-                <!--Shopping cart end-->
-
-                <!--Product cart start-->
-                <div class="row active">
-
-                    <div class="d-flex borderCart" >
-                        <div>
-                            <img src="/public/ImgAssets/Logo.png" alt="" id="miniImg" width="200px" height="100%">
-                        </div>
-
-                        <div class="morespace center">
-                            <div>
-                                <h3 class="mini">Name</h3>
-                                <br>
-                                <h3 class="mini">item #001</h3>
-                            </div>
-                            <div class="add">
-                                <button id="addremove"><p><i class="fa-solid fa-heart"></i> add to wishlist</p></button>
-                            </div>
-                        </div>
-
-                        <div class="morespace center">
-                            <div>
-                                <h3 class="mini">Prince : 150 THB </h3>
-                                <br>
-                                <input class="mini" id="numberProCart" type="number" name="" id="" placeholder="0">
-                            </div>
-                            <div class="remove">
-                                <button id="addremove"><p><i class="fa-solid fa-trash"></i> remove</p></button>
-                            </div>
-                        </div>
-
-                    </div>
-        
-                </div>
-                <!--Shopping cart end-->
-
-                <!--Product cart start-->
-                <div class="row active">
-
-                    <div class="d-flex borderCart" >
-                        <div>
-                            <img src="/public/ImgAssets/Logo.png" alt="" id="miniImg" width="200px" height="100%">
-                        </div>
-
-                        <div class="morespace center">
-                            <div>
-                                <h3 class="mini">Name</h3>
-                                <br>
-                                <h3 class="mini">item #001</h3>
-                            </div>
-                            <div class="add">
-                                <button id="addremove"><p><i class="fa-solid fa-heart"></i> add to wishlist</p></button>
-                            </div>
-                        </div>
-
-                        <div class="morespace center">
-                            <div>
-                                <h3 class="mini">Prince : 150 THB </h3>
-                                <br>
-                                <input class="mini" id="numberProCart" type="number" name="" id="" placeholder="0">
-                            </div>
-                            <div class="remove">
-                                <button id="addremove"><p><i class="fa-solid fa-trash"></i> remove</p></button>
-                            </div>
-                        </div>
-
-                    </div>
-        
-                </div>
-                <!--Shopping cart end-->
-
-
-
+                <% } %>
 
             </div>
 
@@ -163,7 +95,7 @@
                         <h1 class="center minih1">Order summary</h1>
                     </div>
                     <div class="center">
-                        <h2 class="mini">Subtotal TBH : <span> ? </span></h2>
+                        <h2 class="mini">Subtotal THB : <span> <%= subtotal %> </span></h2>
                     </div>
                     <div class="center">
                         <h2 class="mini">Payment : <span> ? </span></h2>
@@ -195,6 +127,66 @@
       integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
       crossorigin="anonymous"
     ></script>
+    
+    <script>
+        async function removeCartItem(cartId) {
+            if(!confirm('Remove this item from your cart?')) return;
+            try {
+                const res = await fetch('/cart/remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cart_id: cartId })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    location.reload(); // reload page to update subtotal and items
+                } else {
+                    alert(data.message || 'Error removing item');
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function updateCartItem(cartId, quantity) {
+            if(quantity < 1) return removeCartItem(cartId);
+            try {
+                const res = await fetch('/cart/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cart_id: cartId, quantity: quantity })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    location.reload(); // reload page to update subtotal
+                } else {
+                    alert(data.message || 'Error updating item');
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function addToWishlist(productId) {
+            try {
+                const response = await fetch('/wishlist/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_id: productId })
+                });
+                const result = await response.json();
+                if (response.status === 401) {
+                    alert(result.message);
+                    window.location.href = '/login';
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+    </script>
   </body>
   
 </html>
