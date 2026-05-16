@@ -33,16 +33,18 @@
             </div>
             <br>
 
-            <label for="Email">Email</label><br>
-            <input type="email" name="email" id="inputEmail" placeholder="Enter Your Email"> 
-            <br>
+            <form action="/login" method="POST">
+                <label for="Email">Email</label><br>
+                <input type="email" name="email" id="inputEmail" placeholder="Enter Your Email" required> 
+                <br>
 
-            <label for="Password">Password</label><br>
-            <input type="password" name="password" id="inputPassword" placeholder="Enter Your Password">
-            <br>
-            <div id="submitButton">
-                <a href="/account-info"><input type="submit" value="Log in"></a>
-            </div>
+                <label for="Password">Password</label><br>
+                <input type="password" name="password" id="inputPassword" placeholder="Enter Your Password" required>
+                <br>
+                <div id="submitButton">
+                    <input type="submit" value="Log in">
+                </div>
+            </form>
             
             <div class="or">
                 <hr>

@@ -33,25 +33,27 @@
             </div>
             <br>
 
-            <label for="name">Name</label><br>
-            <input type="name" name="name" id="inputName" placeholder="Enter Your Name">
-            <br>
+            <form action="/register" method="POST">
+                <label for="name">Name</label><br>
+                <input type="text" name="name" id="inputName" placeholder="Enter Your Name" required>
+                <br>
 
-            <label for="Email">Email</label><br>
-            <input type="email" name="email" id="inputEmail" placeholder="Enter Your Email"> 
-            <br>
+                <label for="Email">Email</label><br>
+                <input type="email" name="email" id="inputEmail" placeholder="Enter Your Email" required> 
+                <br>
 
-            <label for="Password">Password</label><br>
-            <input type="password" name="password" id="inputPassword" placeholder="Enter Your Password">
-            <br>
+                <label for="Password">Password</label><br>
+                <input type="password" name="password" id="inputPassword" placeholder="Enter Your Password" required>
+                <br>
 
-            <label for="ConfirmPassword">Confirm password</label><br>
-            <input type="password" name="confirmPassword" id="inputConfirmPassword" placeholder="Enter Your Password">
-            <br>
+                <label for="ConfirmPassword">Confirm password</label><br>
+                <input type="password" name="confirmPassword" id="inputConfirmPassword" placeholder="Enter Your Password" required>
+                <br>
 
-            <div id="submitButton">
-                <a href="/login"><input type="submit" value="Register"></a>
-            </div>
+                <div id="submitButton">
+                    <input type="submit" value="Register">
+                </div>
+            </form>
             
             <div class="or">
                 <hr>

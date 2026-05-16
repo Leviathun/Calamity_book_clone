@@ -4,13 +4,26 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const path = require('path');
 const ejs = require('ejs'); // Correct 
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 
 const multer = require("multer");//body-parser upgrad
 const upload = multer();
 
 app.use(bodyParser.json());
-
 app.use(upload.none());
+
+app.use(session({
+    secret: 'calamity-book-secret',
+    resave: false,
+    saveUninitialized: false
+}));
+
+// middleware to pass user session to templates
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    next();
+});
 app.set('view engine', 'ejs');
 
 // access to css / photo file
@@ -21,7 +34,7 @@ const db = mysql.createConnection({
     host: "127.0.0.1",
     user: "root",
     password: "Tun-48449",
-    database: "fe_book"
+    database: "ca_book"
 });
 
 // Connect to MySQL
@@ -215,6 +228,53 @@ app.get('/cart', (req, res) => {
     res.render('user/cart_page');
 });
 
+// Add to Cart API
+app.post('/cart/add', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: 'Please login first' });
+    }
+    const { product_id } = req.body;
+    const user_id = req.session.user.id;
+
+    db.query('SELECT * FROM shopping_cart WHERE user_id = ? AND product_id = ?', [user_id, product_id], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: 'Database error' });
+        
+        if (results.length > 0) {
+            db.query('UPDATE shopping_cart SET quantity = quantity + 1 WHERE cart_id = ?', [results[0].cart_id], (err2) => {
+                if (err2) return res.status(500).json({ success: false, message: 'Database error' });
+                res.json({ success: true, message: 'Product quantity updated in your cart!' });
+            });
+        } else {
+            db.query('INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, 1)', [user_id, product_id], (err3) => {
+                if (err3) return res.status(500).json({ success: false, message: 'Database error' });
+                res.json({ success: true, message: 'Product added to your cart!' });
+            });
+        }
+    });
+});
+
+// Add to Wishlist API
+app.post('/wishlist/add', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: 'Please login first' });
+    }
+    const { product_id } = req.body;
+    const user_id = req.session.user.id;
+
+    db.query('SELECT * FROM wishlist WHERE user_id = ? AND product_id = ?', [user_id, product_id], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: 'Database error' });
+        
+        if (results.length > 0) {
+            res.json({ success: true, message: 'Product is already in your wishlist!' });
+        } else {
+            db.query('INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)', [user_id, product_id], (err3) => {
+                if (err3) return res.status(500).json({ success: false, message: 'Database error' });
+                res.json({ success: true, message: 'Product added to your wishlist!' });
+            });
+        }
+    });
+});
+
 //go to comics
 app.get('/comics', (req, res) => {
     res.render('user/comics');
@@ -243,7 +303,25 @@ app.get('/home', (req, res) => {
 
 //go to login
 app.get('/login', (req, res) => {
+    if (req.session.user) return res.redirect('/home');
     res.render('user/login');
+});
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+        if (err) return res.status(500).send('Database error');
+        if (results.length === 0) return res.send('<script>alert("User not found"); window.location.href="/login";</script>');
+        
+        const user = results[0];
+        const match = await bcrypt.compare(password, user.password);
+        if (match) {
+            req.session.user = { id: user.user_id, name: user.name, email: user.email };
+            res.redirect('/home');
+        } else {
+            res.send('<script>alert("Incorrect password"); window.location.href="/login";</script>');
+        }
+    });
 });
 
 //go to product-page
@@ -253,12 +331,34 @@ app.get('/product-page', (req, res) => {
 
 //go to registration
 app.get('/registration', (req, res) => {
+    if (req.session.user) return res.redirect('/home');
     res.render('user/registration');
+});
+
+app.post('/register', async (req, res) => {
+    const { name, email, password, confirmPassword } = req.body;
+    if (password !== confirmPassword) {
+        return res.send('<script>alert("Passwords do not match"); window.location.href="/registration";</script>');
+    }
+    
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword], (err, results) => {
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') return res.send('<script>alert("Email already exists"); window.location.href="/registration";</script>');
+                return res.status(500).send('Database error');
+            }
+            res.send('<script>alert("Registration successful! Please login."); window.location.href="/login";</script>');
+        });
+    } catch (e) {
+        res.status(500).send('Server error');
+    }
 });
 
 //go to home(signout)
 app.get('/sign-out', (req, res) => {
-    res.render('user/home');
+    req.session.destroy();
+    res.redirect('/home');
 });
 // Set the views directory
 app.set('views', path.join(__dirname, 'views'));

@@ -35,3 +35,30 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   });
 });
+
+async function addToCart(productId) {
+  try {
+    const response = await fetch('/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ product_id: productId })
+    });
+    
+    const result = await response.json();
+    
+    if (response.status === 401) {
+      alert(result.message);
+      window.location.href = '/login';
+    } else if (result.success) {
+      alert(result.message);
+      // Optional: Update cart counter in UI here
+    } else {
+      alert('Failed to add to cart: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    alert('An error occurred. Please try again.');
+  }
+}
