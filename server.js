@@ -370,7 +370,7 @@ app.get('/home', (req, res) => {
 //go to login
 app.get('/login', (req, res) => {
     if (req.session.user) return res.redirect('/home');
-    res.render('user/login');
+    res.render('user/login', { layout: false });
 });
 
 app.post('/login', (req, res) => {
@@ -408,7 +408,7 @@ app.get('/product-page', (req, res) => {
 //go to registration
 app.get('/registration', (req, res) => {
     if (req.session.user) return res.redirect('/home');
-    res.render('user/registration');
+    res.render('user/registration', { layout: false });
 });
 
 app.post('/register', async (req, res) => {
