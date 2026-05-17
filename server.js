@@ -3,7 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const path = require('path');
-const ejs = require('ejs'); // Correct 
+const ejs = require('ejs');
+const expressLayouts = require('express-ejs-layouts'); 
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 
@@ -25,6 +26,8 @@ app.use((req, res, next) => {
     next();
 });
 app.set('view engine', 'ejs');
+app.use(expressLayouts);
+app.set('layout', 'layout');
 
 // access to css / photo file
 app.use(express.static("public"));
@@ -104,13 +107,13 @@ function fetchCategory() {
 
 //go to add-category
 app.get('/add-category', (req, res) => {
-    res.render('admin/add_category', {name:'Add'});
+    res.render('admin/add_category', {name:'Add', layout: false});
 });
 
 
 //go to manage-category
 app.get('/manage-category', (req, res) => {
-    res.render('admin/manage_category' ,{ category : app.locals.category });
+    res.render('admin/manage_category' ,{ category : app.locals.category , layout: false});
 });
 
 
@@ -125,64 +128,64 @@ app.get('/manage-category', (req, res) => {
 
 //go to edit-category
 app.get('/edit-category', (req, res) => {
-    res.render('admin/edit_category', {name:'Edit'});
+    res.render('admin/edit_category', {name:'Edit', layout: false});
 });
 
 
 //go to add-product
 app.get('/add-product', (req, res) => {
-    res.render('admin/add_product', {name:'Add'});
+    res.render('admin/add_product', {name:'Add', layout: false});
 });
 
 //go to edit-product
 app.get('/edit-product', (req, res) => {
-    res.render('admin/edit_product');
+    res.render('admin/edit_product', { layout: false });
 });
 //go to manage-product
 app.get('/manage-product', (req, res) => {
-    res.render('admin/manage_product');
+    res.render('admin/manage_product', { layout: false });
 });
 
 //go to top-product
 app.get('/top-product', (req, res) => {
-    res.render('admin/top_product');
+    res.render('admin/top_product', { layout: false });
 });
 
 //go to bill-summary
 app.get('/bill-summary', (req, res) => {
-    res.render('admin/bill_summary');
+    res.render('admin/bill_summary', { layout: false });
 });
 
 //go to staff-login
 app.get('/staff-login', (req, res) => {
-    res.render('admin/staff_login');
+    res.render('admin/staff_login', { layout: false });
 });
 
 //go to staff-order
 app.get('/staff-order', (req, res) => {
-    res.render('admin/staff_order');
+    res.render('admin/staff_order', { layout: false });
 });
 
 //go to staff-product-dashboard
 app.get('/dashboard', (req, res) => {
-    res.render('admin/dashboard');
+    res.render('admin/dashboard', { layout: false });
 });
 //go to staff-product-product
 app.get('/staff-product', (req, res) => {
-    res.render('admin/staff_product');
+    res.render('admin/staff_product', { layout: false });
 });
 //go to staff-product-order
 app.get('/staff-order', (req, res) => {
-    res.render('admin/staff_order');
+    res.render('admin/staff_order', { layout: false });
 });
 //go to staff-product-setting
 app.get('/staff-setting', (req, res) => {
-    res.render('admin/staff_setting');
+    res.render('admin/staff_setting', { layout: false });
 });
 
 //go to staff-setting
 app.get('/staff-setting', (req, res) => {
-    res.render('admin/staff_setting');
+    res.render('admin/staff_setting', { layout: false });
 });
 //go to address-book
 app.get('/address-book', (req, res) => {
