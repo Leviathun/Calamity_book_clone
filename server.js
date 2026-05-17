@@ -218,7 +218,67 @@ app.get('/about_us', (req, res) => {
 
 //go to account-info
 app.get('/account-info', (req, res) => {
-    res.render('user/account_info');
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    const userId = req.session.user.id;
+    db.query('SELECT * FROM users WHERE user_id = ?', [userId], (err, userResults) => {
+        if (err || userResults.length === 0) {
+            return res.render('user/account_info');
+        }
+        const userData = {
+            id: userResults[0].user_id,
+            name: userResults[0].name,
+            email: userResults[0].email,
+            phone: userResults[0].phone,
+            created_at: userResults[0].created_at
+        };
+        res.locals.user = userData;
+
+        // Also fetch address
+        db.query('SELECT * FROM address_book WHERE user_id = ? LIMIT 1', [userId], (err2, addrResults) => {
+            res.locals.address = (addrResults && addrResults.length > 0) ? addrResults[0] : null;
+            res.render('user/account_info');
+        });
+    });
+});
+
+// Update profile + address
+app.post('/account-info/update', (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const userId = req.session.user.id;
+    const { name, phone, address_line, city, zip_code } = req.body;
+
+    // Update user info
+    db.query('UPDATE users SET name = ?, phone = ? WHERE user_id = ?', [name, phone, userId], (err) => {
+        if (err) return res.status(500).json({ success: false, message: 'Error updating profile' });
+
+        // Update session name
+        req.session.user.name = name;
+
+        // Upsert address
+        if (address_line || city || zip_code) {
+            db.query('SELECT * FROM address_book WHERE user_id = ?', [userId], (err2, addrResults) => {
+                if (err2) return res.status(500).json({ success: false, message: 'Error checking address' });
+
+                if (addrResults.length > 0) {
+                    db.query('UPDATE address_book SET address_line = ?, city = ?, zip_code = ? WHERE user_id = ?',
+                        [address_line, city, zip_code, userId], (err3) => {
+                            if (err3) return res.status(500).json({ success: false, message: 'Error updating address' });
+                            res.json({ success: true, message: 'Profile updated!' });
+                        });
+                } else {
+                    db.query('INSERT INTO address_book (user_id, address_line, city, zip_code) VALUES (?, ?, ?, ?)',
+                        [userId, address_line, city, zip_code], (err3) => {
+                            if (err3) return res.status(500).json({ success: false, message: 'Error saving address' });
+                            res.json({ success: true, message: 'Profile updated!' });
+                        });
+                }
+            });
+        } else {
+            res.json({ success: true, message: 'Profile updated!' });
+        }
+    });
 });
 
 //go to all-category
