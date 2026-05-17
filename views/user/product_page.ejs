@@ -1,169 +1,229 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Page</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://kit.fontawesome.com/451145afdd.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="css/Home.css">
-    <link rel="stylesheet" href="css/Product-page.css">
-</head>
-<body>
+<div class="containers wraper">
 
-<%- include('../templates/nav-bar-user') %>
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav">
+    <a href="/home">Home</a>
+    <span class="separator"><i class="fa-solid fa-chevron-right fa-2xs"></i></span>
+    <a href="/all-category"><%= product.category_type %></a>
+    <span class="separator"><i class="fa-solid fa-chevron-right fa-2xs"></i></span>
+    <span class="current"><%= product.product_name %></span>
+  </nav>
 
-<div class="containers wraper" style="margin-top: 50px; margin-bottom: 50px;">
-    <div class="row top-contact">
-        <div class="col-sm-6 col-lg-6 center">        
-            <div class="products-item">
-                <div class="products-img position-relative">
-                    <a href="/product-page?id=<%= product.product_id %>"> 
-                        <img src="<%= product.img_link %>" alt="<%= product.product_name %>" style="max-height: 400px; object-fit: contain;">
-                    </a>
-                    <% if (product.percent > 0) { %>
-                    <p class="product-label position-absolute">
-                        <span class="line-1"><%= product.percent %></span> 
-                        <br>
-                        <span class="line-2">OFF</span> 
-                    </p>
-                    <% } %>
-                </div>
-            </div>
+  <!-- Product Hero -->
+  <div class="product-hero">
+
+    <!-- Left: Image -->
+    <div class="product-gallery">
+      <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
+      <% if (product.percent > 0) { %>
+      <span class="product-badge"><%= product.percent %>% OFF</span>
+      <% } %>
+    </div>
+
+    <!-- Right: Info -->
+    <div class="product-info">
+      <h1 class="product-title"><%= product.product_name %></h1>
+
+      <span class="category-badge">
+        <i class="fa-solid fa-bookmark"></i>
+        <%= product.category_type %>
+      </span>
+
+      <!-- Star Rating -->
+      <div class="star-rating">
+        <% for(let i=1; i<=5; i++) { %>
+          <% if (i <= Math.round(product.star)) { %>
+            <i class="fa-solid fa-star"></i>
+          <% } else { %>
+            <i class="fa-regular fa-star"></i>
+          <% } %>
+        <% } %>
+        <span class="rating-text">(<%= product.star %> / 5)</span>
+      </div>
+
+      <hr class="product-divider">
+
+      <!-- Price -->
+      <div class="price-section">
+        <% if (product.price_discount && product.price_discount < product.price) { %>
+          <span class="price-current"><i class="fa-solid fa-baht-sign"></i><%= product.price_discount %></span>
+          <span class="price-original"><i class="fa-solid fa-baht-sign"></i><%= product.price %></span>
+          <span class="price-save">Save <%= product.percent %>%</span>
+        <% } else { %>
+          <span class="price-current"><i class="fa-solid fa-baht-sign"></i><%= product.price %></span>
+        <% } %>
+      </div>
+
+      <!-- Availability -->
+      <div class="availability">
+        <% if (product.quantity > 0) { %>
+          <span class="stock-dot in-stock"></span>
+          <span class="stock-text in-stock">In Stock (<%= product.quantity %> available)</span>
+        <% } else { %>
+          <span class="stock-dot out-of-stock"></span>
+          <span class="stock-text out-of-stock">Out of Stock</span>
+        <% } %>
+      </div>
+
+      <hr class="product-divider">
+
+      <!-- Quantity Selector -->
+      <div class="qty-section">
+        <p class="qty-label">Quantity</p>
+        <div class="qty-selector">
+          <button type="button" class="qty-btn" id="qty-minus" onclick="changeQty(-1)">−</button>
+          <input type="number" class="qty-input" id="product-quantity-input" value="1" min="1" max="<%= product.quantity %>">
+          <button type="button" class="qty-btn" id="qty-plus" onclick="changeQty(1)">+</button>
         </div>
+      </div>
 
-        <div class="col-sm-6 col-lg-6 ">
-            <div class="Product-info">
-                <h4 id="product-title"><%= product.product_name %></h4>
-                <h4 id="product-item">ID: <%= product.product_id %></h4>
-                <p>
-                    <% for(let i=1; i<=5; i++) { %>
-                        <% if (i <= Math.round(product.star)) { %>
-                            <i class="fa-solid fa-star" style="color: gold;"></i>
-                        <% } else { %>
-                            <i class="fa-regular fa-star"></i>
-                        <% } %>
-                    <% } %>
-                    (<%= product.star %>)
-                </p>
-                <div class="products-price">
-                    <% if (product.price_discount && product.price_discount < product.price) { %>
-                    <div class="discount">
-                        <p><i class="fa-solid fa-baht-sign"></i><%= product.price_discount %></p>
-                    </div>
-                    <div class="original">
-                        <p><span class="line-discount"><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
-                    </div>
-                    <% } else { %>
-                    <div class="discount">
-                        <p><i class="fa-solid fa-baht-sign"></i><%= product.price %></p>
-                    </div>
-                    <% } %>
-                </div>
-                <h4>Availability : <span id="product-availability"><%= product.quantity > 0 ? 'In Stock (' + product.quantity + ')' : 'Out of Stock' %></span></h4>
-            </div>
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn-add-cart" type="button" onclick="addSpecificQuantityToCart(<%= product.product_id %>)">
+          <i class="fa-solid fa-cart-shopping"></i>
+          Add to Cart
+        </button>
+        <button class="btn-wishlist" type="button" onclick="addToWishlist(<%= product.product_id %>)">
+          <i class="fa-regular fa-heart"></i>
+          Wishlist
+        </button>
+      </div>
+    </div>
+  </div>
 
-            <div class="d-flex mt-4">
-                <div>
-                    <div class="dropdown-center"> 
-                        <input class="btn btn-secondary" type="number" id="product-quantity-input" value="1" min="1" max="<%= product.quantity %>" style="width: 100px;">                       
-                    </div>
-                </div>
-                <div class="ms-5">
-                    <button class="btn btn-secondary" type="button" id="add-to-cart-btn" onclick="addSpecificQuantityToCart(<%= product.product_id %>)">Add to cart</button>
-                </div>
-                <div class="ms-3">
-                    <button class="btn btn-outline-danger" type="button" onclick="addToWishlist(<%= product.product_id %>)"><i class="fa-solid fa-heart"></i> Wishlist</button>
-                </div>
-            </div>
-        </div>             
+  <!-- Book Details Section -->
+  <section class="details-section">
+    <div class="details-header">
+      <div class="detail-icon">
+        <i class="fa-solid fa-book-open"></i>
+      </div>
+      <h2>Book Details</h2>
     </div>
 
-    <!-- Details -->
-    <div class="flashsale mt-5">
-        <div class="d-flex flex-column flex-lg-row center">
-            <h2 class="filterflashsale-title">Details</h2>                
-        </div> 
-    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-heading"></i>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Title</span>
+          <span class="info-value"><%= product.product_name %></span>
+        </div>
+      </div>
 
-    <div class="row top-contact">
-        <table class="table">
-            <tr>
-                <th>Title</th>
-                <td id="product-name"><%= product.product_name %></td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td id="product-category"><%= product.category_type %></td>
-            </tr>
-            <tr>
-                <th>Publication Date</th>
-                <td id="product-publication-date">
-                    <% if (product.public_date) { %>
-                        <%= new Date(product.public_date).toLocaleDateString() %>
-                    <% } else { %>
-                        -
-                    <% } %>
-                </td>
-            </tr>
-        </table>
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Category</span>
+          <span class="info-value"><%= product.category_type %></span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-calendar-days"></i>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Publication Date</span>
+          <span class="info-value">
+            <% if (product.public_date) { %>
+              <%= new Date(product.public_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+            <% } else { %>
+              Not available
+            <% } %>
+          </span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Stock</span>
+          <span class="info-value"><%= product.quantity %> units</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Rating</span>
+          <span class="info-value"><%= product.star %> / 5.0</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-fingerprint"></i>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Product ID</span>
+          <span class="info-value">#<%= product.product_id %></span>
+        </div>
+      </div>
     </div>
+  </section>
 </div>
 
-<%- include('../templates/user-footer') %>
-
-<script src="js/home.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-
 <script>
-async function addSpecificQuantityToCart(productId) {
-    const qtyInput = document.getElementById('product-quantity-input');
-    const quantity = parseInt(qtyInput.value) || 1;
-    
-    try {
-        const response = await fetch('/cart/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ product_id: productId, quantity: quantity })
-        });
-        const result = await response.json();
-        if (response.status === 401) {
-            alert(result.message);
-            window.location.href = '/login';
-        } else if (result.success) {
-            alert(result.message);
-        } else {
-            alert('Failed: ' + result.message);
-        }
-    } catch (error) {
-        console.error(error);
-        alert('Error adding to cart');
-    }
+// Quantity +/- buttons
+function changeQty(delta) {
+  const input = document.getElementById('product-quantity-input');
+  let val = parseInt(input.value) || 1;
+  const max = parseInt(input.max) || 999;
+  val = Math.max(1, Math.min(max, val + delta));
+  input.value = val;
 }
 
-async function addToWishlist(productId) {
-    try {
-        const response = await fetch('/wishlist/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ product_id: productId })
-        });
-        const result = await response.json();
-        if (response.status === 401) {
-            alert(result.message);
-            window.location.href = '/login';
-        } else {
-            alert(result.message);
-        }
-    } catch (error) {
-        console.error(error);
-        alert('Error adding to wishlist');
+// Add to cart with specific quantity
+async function addSpecificQuantityToCart(productId) {
+  const qtyInput = document.getElementById('product-quantity-input');
+  const quantity = parseInt(qtyInput.value) || 1;
+  
+  try {
+    const response = await fetch('/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_id: productId, quantity: quantity })
+    });
+    const result = await response.json();
+    if (response.status === 401) {
+      alert(result.message);
+      window.location.href = '/login';
+    } else if (result.success) {
+      alert(result.message);
+    } else {
+      alert('Failed: ' + result.message);
     }
+  } catch (error) {
+    console.error(error);
+    alert('Error adding to cart');
+  }
+}
+
+// Add to wishlist
+async function addToWishlist(productId) {
+  try {
+    const response = await fetch('/wishlist/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_id: productId })
+    });
+    const result = await response.json();
+    if (response.status === 401) {
+      alert(result.message);
+      window.location.href = '/login';
+    } else {
+      alert(result.message);
+    }
+  } catch (error) {
+    console.error(error);
+    alert('Error adding to wishlist');
+  }
 }
 </script>
-</body>
-</html>
