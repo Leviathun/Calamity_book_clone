@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
   window.onclick = (e) => {
     if (
       e.target.id !== "drop-text" &&
-      e.target.id !== "icon"
+      e.target.id !== "icon" &&
+      e.target.id !== "span"
     ) {
       list.classList.remove("show");
       icon.style.transform = "rotate(0deg)";
@@ -26,12 +27,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   listItem.forEach(item => {
     item.onclick = (e) => {
-      dropdownBtn.innerText = e.target.innerText;
+      e.preventDefault();
+      dropdownBtn.querySelector('span').innerText = e.target.innerText;
       if (e.target.innerText === "All category") {
         input.placeholder = "Find your favorite book...";
       } else {
         input.placeholder = "Your category is " + e.target.innerText + "...";
       }
+      
+      // Close dropdown after selection
+      list.classList.remove("show");
+      icon.style.transform = "rotate(0deg)";
     };
   });
 });
