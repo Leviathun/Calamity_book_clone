@@ -47,7 +47,7 @@ db.connect((err) => {
         return;
     }
     console.log('Connected to MySQL database');
-    // Now you can start fetching products
+
     fetchProducts();
     fetchCategory();
 });
@@ -116,21 +116,10 @@ app.get('/manage-category', (req, res) => {
     res.render('admin/manage_category' ,{ category : app.locals.category , layout: false});
 });
 
-
-
-
-
-
-
-
-
-
-
 //go to edit-category
 app.get('/edit-category', (req, res) => {
     res.render('admin/edit_category', {name:'Edit', layout: false});
 });
-
 
 //go to add-product
 app.get('/add-product', (req, res) => {
@@ -187,28 +176,145 @@ app.get('/staff-setting', (req, res) => {
 app.get('/staff-setting', (req, res) => {
     res.render('admin/staff_setting', { layout: false });
 });
-//go to address-book
-app.get('/address-book', (req, res) => {
-    res.render('user/address_book');
-});
 
-//go to my-order
+
+//go to my-order (consolidated: orders + wishlist + history)
 app.get('/my-order', (req, res) => {
-    res.render('user/my_order');
+    if (!req.session.user) return res.redirect('/login');
+    const userId = req.session.user.id;
+
+    // 1) Recent 5 orders with first item image
+    const recentSQL = `
+        SELECT o.*, 
+               (SELECT p.product_name FROM order_items oi JOIN product p ON oi.product_id = p.product_id WHERE oi.order_id = o.order_id LIMIT 1) as product_name,
+               (SELECT p.img_link FROM order_items oi JOIN product p ON oi.product_id = p.product_id WHERE oi.order_id = o.order_id LIMIT 1) as img_link
+        FROM orders o WHERE o.user_id = ? ORDER BY o.order_date DESC LIMIT 5
+    `;
+    // 2) All orders with item count
+    const allSQL = `
+        SELECT o.*, COUNT(oi.order_item_id) as item_count
+        FROM orders o LEFT JOIN order_items oi ON o.order_id = oi.order_id
+        WHERE o.user_id = ? GROUP BY o.order_id ORDER BY o.order_date DESC
+    `;
+    // 3) Wishlist
+    const wishSQL = `
+        SELECT w.wishlist_id, p.product_id, p.product_name, p.price, p.price_discount, p.img_link
+        FROM wishlist w JOIN product p ON w.product_id = p.product_id
+        WHERE w.user_id = ?
+    `;
+
+    db.query(recentSQL, [userId], (e1, recentOrders) => {
+        db.query(allSQL, [userId], (e2, allOrders) => {
+            db.query(wishSQL, [userId], (e3, wishlistItems) => {
+                res.render('user/my_order', {
+                    recentOrders: recentOrders || [],
+                    allOrders: allOrders || [],
+                    wishlistItems: wishlistItems || []
+                });
+            });
+        });
+    });
 });
 
-//go to my-wishlist
+//go to my-wishlist (redirect to my-order now)
 app.get('/wishlist', (req, res) => {
-    res.render('user/my_wishlist');
+    res.redirect('/my-order');
 });
 
-app.get('/test', (req, res) => {
-    res.render('user/test');
+// Remove from wishlist
+app.post('/wishlist/remove', (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const { wishlist_id } = req.body;
+    db.query('DELETE FROM wishlist WHERE wishlist_id = ? AND user_id = ?', [wishlist_id, req.session.user.id], (err) => {
+        if (err) return res.status(500).json({ success: false, message: 'Database error' });
+        res.json({ success: true, message: 'Removed from wishlist' });
+    });
 });
 
-//go to track-order
-app.get('/track-order', (req, res) => {
-    res.render('user/track_order');
+// ========== PAYMENT ROUTES ==========
+// GET payment page
+app.get('/payment', (req, res) => {
+    if (!req.session.user) return res.redirect('/login');
+    const userId = req.session.user.id;
+    const query = `
+        SELECT c.cart_id, c.quantity, p.product_id, p.product_name, p.price, p.price_discount, p.img_link
+        FROM shopping_cart c JOIN product p ON c.product_id = p.product_id
+        WHERE c.user_id = ?
+    `;
+    db.query(query, [userId], (err, results) => {
+        if (err || !results || results.length === 0) {
+            return res.redirect('/cart');
+        }
+        let subtotal = 0;
+        results.forEach(item => {
+            subtotal += (item.price_discount || item.price) * item.quantity;
+        });
+        res.render('user/payment', { cartItems: results, subtotal });
+    });
+});
+
+// POST process payment
+app.post('/payment/process', (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const userId = req.session.user.id;
+    const { payment_method } = req.body; // 'credit_card' or 'cod'
+
+    // Get cart items
+    const cartQuery = `
+        SELECT c.quantity, p.product_id, p.price, p.price_discount
+        FROM shopping_cart c JOIN product p ON c.product_id = p.product_id
+        WHERE c.user_id = ?
+    `;
+    db.query(cartQuery, [userId], (err, cartItems) => {
+        if (err || cartItems.length === 0) {
+            return res.status(400).json({ success: false, message: 'Cart is empty' });
+        }
+
+        // Calculate total
+        let total = 0;
+        cartItems.forEach(item => {
+            total += (item.price_discount || item.price) * item.quantity;
+        });
+
+        // Determine status based on payment method
+        let status = 'Pending';
+        if (payment_method === 'credit_card') {
+            // Credit card = always Paid, then random shipping state
+            const rand = Math.random();
+            if (rand < 0.4) status = 'Paid';
+            else if (rand < 0.7) status = 'Shipping';
+            else if (rand < 0.9) status = 'Delivered';
+            else status = 'Returned';
+        }
+        // COD = always Pending
+
+        // Create order
+        db.query(
+            'INSERT INTO orders (user_id, total_price, status, payment_method) VALUES (?, ?, ?, ?)',
+            [userId, total, status, payment_method],
+            (err2, orderResult) => {
+                if (err2) return res.status(500).json({ success: false, message: 'Error creating order' });
+                const orderId = orderResult.insertId;
+
+                // Insert order items
+                const itemValues = cartItems.map(item => [
+                    orderId, item.product_id, item.quantity, (item.price_discount || item.price)
+                ]);
+                db.query(
+                    'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ?',
+                    [itemValues],
+                    (err3) => {
+                        if (err3) return res.status(500).json({ success: false, message: 'Error saving order items' });
+
+                        // Clear cart
+                        db.query('DELETE FROM shopping_cart WHERE user_id = ?', [userId], (err4) => {
+                            res.json({ success: true, message: 'Payment successful!', orderId });
+                        });
+                    }
+                );
+            }
+        );
+    });
 });
 
 //go to about-us

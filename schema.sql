@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS orders (
     user_id INT NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     status VARCHAR(50) DEFAULT 'Pending',
+    payment_method VARCHAR(50) DEFAULT 'credit_card',
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
