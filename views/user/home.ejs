@@ -38,26 +38,32 @@
         Promotion
       </h2>
 
+      <% if (typeof activePromoGroup !== 'undefined' && activePromoGroup) { %>
       <div>
-        <div id="counter" class="counter">
+        <div id="counter" class="counter" data-endtime="<%= activePromoGroup.end_time.toISOString() %>">
           <ul class="countdown">
             <li class="first" style="display: none;">
-              <div class="countdown_num" id="cd_day-82520" style="display: none;"></div><div id="cd_day"></div>
+              <div class="countdown_num" id="cd_day" style="display: none;"></div><div id="cd_day_lbl"></div>
             </li>
             <li>
-              <div class="countdown_num" id="cd_hour-82520">07</div><div id="cd_hour">Hours</div>
+              <div class="countdown_num" id="cd_hour">00</div><div id="cd_hour_lbl">Hours</div>
             </li>
             <li>
-              <div class="countdown_num" id="cd_min-82520">38</div><div id="cd_minute">Minutes</div>
+              <div class="countdown_num" id="cd_min">00</div><div id="cd_minute_lbl">Minutes</div>
             </li>
             <li class="last">
-              <div class="countdown_num" id="cd_sec-82520">02</div><div id="cd_second">Seconds</div>
+              <div class="countdown_num" id="cd_sec">00</div><div id="cd_second_lbl">Seconds</div>
             </li>
           </ul>
           <div class="clear"><span>&nbsp;</span></div>
         </div>
-        <div id="expired" style="display:none;">The deadline has passed.</div>
+        <div id="expired" style="display:none; font-weight: bold; color: #ff4a5a;" class="ms-lg-3">Deadline passed! Resets happening...</div>
       </div>
+      <% } else { %>
+      <div class="promo-static-msg ms-lg-3 text-warning fw-bold d-flex align-items-center gap-2" style="font-size: 0.95rem; font-family: 'Inter', sans-serif;">
+        <i class="fa-solid fa-gift fa-bounce" style="color: #ff4a5a;"></i> Special discounts just for you!
+      </div>
+      <% } %>
     </div>
     
     <div class="btnViewall">

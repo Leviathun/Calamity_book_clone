@@ -8,11 +8,28 @@ const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 
-const multer = require("multer");//body-parser upgrad
-const upload = multer();
+const multer = require("multer");
+const fs = require('fs');
+
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer storage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const uploadFile = multer({ storage: storage });
 
 app.use(bodyParser.json());
-app.use(upload.none());
 
 app.use(session({
     secret: 'calamity-book-secret',
@@ -23,8 +40,17 @@ app.use(session({
 // middleware to pass user session to templates
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
+    res.locals.admin = req.session.admin || null;
     next();
 });
+
+// Middleware to protect admin routes
+function isAdmin(req, res, next) {
+    if (req.session && req.session.admin) {
+        return next();
+    }
+    res.redirect('/staff-login');
+}
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.set('layout', 'layout');
@@ -48,9 +74,68 @@ db.connect((err) => {
     }
     console.log('Connected to MySQL database');
 
+    // Create staff table if not exists and seed default admin
+    const createStaffTable = `
+        CREATE TABLE IF NOT EXISTS staff (
+            admin_id VARCHAR(50) PRIMARY KEY,
+            admin_name VARCHAR(100) NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    db.query(createStaffTable, (errStaff) => {
+        if (errStaff) {
+            console.error('Error creating staff table:', errStaff);
+        } else {
+            const insertAdmin = `
+                INSERT IGNORE INTO staff (admin_id, admin_name, password)
+                VALUES ('123456', 'Administrator', '123456')
+            `;
+            db.query(insertAdmin, (errAdmin) => {
+                if (errAdmin) console.error('Error inserting default admin:', errAdmin);
+            });
+        }
+    });
+
     fetchProducts();
     fetchCategory();
+    checkExpiredPromotions();
 });
+
+// Automated checker for expired promotions
+function checkExpiredPromotions() {
+    const now = new Date();
+    db.query('SELECT * FROM promotion_groups WHERE is_active = 1 AND end_time <= ?', [now], (err, expiredGroups) => {
+        if (err) {
+            console.error('Error selecting expired promotions:', err);
+            return;
+        }
+        if (expiredGroups && expiredGroups.length > 0) {
+            expiredGroups.forEach(group => {
+                console.log(`[PROMOTION EXPIRED] Resetting promotion group ID: ${group.group_id}`);
+                db.query(
+                    'UPDATE product SET percent = 0, price_discount = price, secondary_category = NULL, promo_group_id = NULL WHERE promo_group_id = ?',
+                    [group.group_id],
+                    (err2) => {
+                        if (err2) console.error(`Error resetting products for group ${group.group_id}:`, err2);
+                        
+                        db.query(
+                            'UPDATE promotion_groups SET is_active = 0 WHERE group_id = ?',
+                            [group.group_id],
+                            (err3) => {
+                                if (err3) console.error(`Error deactivating group ${group.group_id}:`, err3);
+                                fetchProducts(); // Sync EJS app.locals.products
+                            }
+                        );
+                    }
+                );
+            });
+        }
+    });
+}
+
+// Check every 10 seconds
+setInterval(checkExpiredPromotions, 10000);
 
 // Function to fetch Allproducts
 function fetchProducts() {
@@ -67,7 +152,10 @@ function fetchProducts() {
 
 //render home page
 app.get('/', (req, res) => {
-    res.render('user/home', { product : app.locals.products });
+    db.query('SELECT * FROM promotion_groups WHERE is_active = 1 AND end_time > NOW() ORDER BY end_time ASC LIMIT 1', (err, promoResults) => {
+        const activePromoGroup = (promoResults && promoResults.length > 0) ? promoResults[0] : null;
+        res.render('user/home', { product : app.locals.products, activePromoGroup });
+    });
 });
 
 //add category
@@ -86,7 +174,7 @@ app.post('/book/add', (req, res) => {
         }
         console.log('Data inserted successfully:', results);
 
-        res.redirect('/manage-category');
+        res.redirect('/manage-product?tab=categories');
         
     });
 });
@@ -105,76 +193,365 @@ function fetchCategory() {
 }
 
 
-//go to add-category
-app.get('/add-category', (req, res) => {
-    res.render('admin/add_category', {name:'Add', layout: false});
+// Redirect legacy category/product routes to unified manage-product
+app.get('/add-category', isAdmin, (req, res) => {
+    res.redirect('/manage-product?tab=categories');
 });
 
-
-//go to manage-category
-app.get('/manage-category', (req, res) => {
-    res.render('admin/manage_category' ,{ category : app.locals.category , layout: false});
+app.get('/manage-category', isAdmin, (req, res) => {
+    res.redirect('/manage-product?tab=categories');
 });
 
-//go to edit-category
-app.get('/edit-category', (req, res) => {
-    res.render('admin/edit_category', {name:'Edit', layout: false});
+app.get('/edit-category', isAdmin, (req, res) => {
+    res.redirect('/manage-product?tab=categories');
 });
 
-//go to add-product
-app.get('/add-product', (req, res) => {
-    res.render('admin/add_product', {name:'Add', layout: false});
+app.get('/add-product', isAdmin, (req, res) => {
+    res.redirect('/manage-product');
 });
 
-//go to edit-product
-app.get('/edit-product', (req, res) => {
-    res.render('admin/edit_product', { layout: false });
+app.get('/edit-product', isAdmin, (req, res) => {
+    res.redirect('/manage-product');
+});
+
+// GET Product details by ID for Edit AJAX Modal
+app.get('/admin/product/details/:id', isAdmin, (req, res) => {
+    const productId = req.params.id;
+    db.query('SELECT * FROM product WHERE product_id = ?', [productId], (err, results) => {
+        if (err) {
+            console.error('Error fetching product details:', err);
+            return res.status(500).json({ success: false, message: 'Database error fetching product details' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+        res.json({ success: true, product: results[0] });
+    });
 });
 //go to manage-product
-app.get('/manage-product', (req, res) => {
-    res.render('admin/manage_product', { layout: false });
+app.get('/manage-product', isAdmin, (req, res) => {
+    db.query('SELECT * FROM category', (err, categories) => {
+        if (err) {
+            console.error('Error fetching categories for manage-product:', err);
+            categories = [];
+        }
+        res.render('admin/manage_product', { categories, layout: false });
+    });
+});
+
+// GET Promotions Management View
+app.get('/admin/promotions', isAdmin, (req, res) => {
+    // 1) Fetch all products
+    db.query('SELECT * FROM product', (err, products) => {
+        if (err) products = [];
+        
+        // 2) Fetch active and past promotion groups
+        db.query('SELECT * FROM promotion_groups ORDER BY start_time DESC', (err2, groups) => {
+            if (err2) groups = [];
+            
+            res.render('admin/promotions', {
+                products,
+                groups,
+                activeTab: 'promotions',
+                layout: false
+            });
+        });
+    });
+});
+
+// POST API to Create a Group Promotion
+app.post('/admin/promotion/create-group', (req, res) => {
+    const { groupName, durationHours, products } = req.body;
+    
+    if (!groupName || !durationHours || !products || !Array.isArray(products) || products.length === 0) {
+        return res.status(400).json({ success: false, message: 'Invalid data. Group name, duration, and selected products are required.' });
+    }
+
+    const duration = parseFloat(durationHours);
+    const endTime = new Date(Date.now() + duration * 60 * 60 * 1000);
+
+    // 1) Insert group record
+    const qInsertGroup = 'INSERT INTO promotion_groups (group_name, duration_hours, end_time, is_active) VALUES (?, ?, ?, 1)';
+    db.query(qInsertGroup, [groupName, duration, endTime], (err, result) => {
+        if (err) {
+            console.error('Error inserting promotion group:', err);
+            return res.status(500).json({ success: false, message: 'Database error creating promotion group.' });
+        }
+        
+        const groupId = result.insertId;
+
+        // 2) Link products and apply individual percentage discounts
+        let completedCount = 0;
+        let hasError = false;
+
+        products.forEach(pItem => {
+            const prodId = parseInt(pItem.id, 10);
+            const percent = parseInt(pItem.percent, 10) || 0;
+
+            // Fetch product standard base price
+            db.query('SELECT price FROM product WHERE product_id = ?', [prodId], (err2, prodRes) => {
+                if (err2 || prodRes.length === 0) {
+                    hasError = true;
+                    completedCount++;
+                    checkDone();
+                    return;
+                }
+
+                const basePrice = parseFloat(prodRes[0].price);
+                const discountPrice = basePrice * (1 - percent / 100);
+
+                const qUpdateProduct = `
+                    UPDATE product 
+                    SET percent = ?, price_discount = ?, secondary_category = 'Promotion', promo_group_id = ?
+                    WHERE product_id = ?
+                `;
+                db.query(qUpdateProduct, [percent, discountPrice, groupId, prodId], (err3) => {
+                    if (err3) {
+                        hasError = true;
+                    }
+                    completedCount++;
+                    checkDone();
+                });
+            });
+        });
+
+        function checkDone() {
+            if (completedCount === products.length) {
+                if (hasError) {
+                    return res.status(500).json({ success: false, message: 'Promotion group was created, but some products failed to link correctly.' });
+                }
+                fetchProducts(); // Refresh globals
+                res.json({ success: true, message: 'Group promotion created successfully and is now active!' });
+            }
+        }
+    });
+});
+
+// GET products by category for management list (with dynamic sold quantities)
+app.get('/get-products', (req, res) => {
+    const { category } = req.query;
+    if (!category) {
+        return res.status(400).json({ error: 'Category is required' });
+    }
+    const qProducts = `
+        SELECT p.product_id AS id, p.product_name AS name, p.price, COALESCE(p.img_link, p.img_url) AS image, COALESCE(SUM(oi.quantity), 0) AS saleCount
+        FROM product p
+        LEFT JOIN order_items oi ON p.product_id = oi.product_id
+        WHERE p.category_type = ?
+        GROUP BY p.product_id
+    `;
+    db.query(qProducts, [category], (err, results) => {
+        if (err) {
+            console.error('Error querying products by category:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(results);
+    });
+});
+
+// Delete Product API
+app.post('/admin/product/delete', (req, res) => {
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).json({ success: false, message: 'Product ID is required' });
+    }
+    db.query('DELETE FROM product WHERE product_id = ?', [id], (err, results) => {
+        if (err) {
+            console.error('Error deleting product:', err);
+            return res.status(500).json({ success: false, message: 'Database error deleting product' });
+        }
+        res.json({ success: true, message: 'Product deleted successfully' });
+    });
+});
+
+// Submit Add Product API (Multipart Form upload)
+app.post('/submit-product', uploadFile.single('image'), (req, res) => {
+    const { productName, category, quantity, regularPrice, salePrice, publicationDate } = req.body;
+
+    if (!productName || !regularPrice) {
+        return res.status(400).json({ success: false, message: 'Product Name and Regular Price are required.' });
+    }
+
+    // Look up category ID
+    db.query('SELECT category_id FROM category WHERE category_type = ?', [category], (err, catRes) => {
+        const categoryId = (catRes && catRes.length > 0) ? catRes[0].category_id : null;
+        
+        // Handle cover image
+        let imgPath = '';
+        if (req.file) {
+            imgPath = '/uploads/' + req.file.filename;
+        } else {
+            imgPath = 'https://picsum.photos/seed/' + Math.floor(Math.random() * 1000) + '/200/300';
+        }
+
+        const price = parseFloat(regularPrice);
+        const priceDiscount = salePrice ? parseFloat(salePrice) : price;
+        const percent = Math.round((1 - priceDiscount / price) * 100);
+        const qty = parseInt(quantity, 10) || 0;
+        const pubDate = publicationDate ? publicationDate : null;
+
+        const qInsert = `
+            INSERT INTO product (product_name, category_id, category_type, img_url, img_link, percent, price, price_discount, quantity, public_date, star)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 5.0)
+        `;
+        const params = [productName, categoryId, category, imgPath, imgPath, percent, price, priceDiscount, qty, pubDate];
+
+        db.query(qInsert, params, (err2, results) => {
+            if (err2) {
+                console.error('Error inserting product in DB:', err2);
+                return res.status(500).json({ success: false, message: 'Database error adding product.' });
+            }
+            // Fetch updated list of products to keep app.locals.products synced
+            fetchProducts();
+            res.json({ success: true, message: 'Product added successfully!' });
+        });
+    });
+});
+
+// Edit Product API (Multipart Form upload)
+app.post('/admin/product/edit/:id', uploadFile.single('image'), (req, res) => {
+    const productId = req.params.id;
+    const { productName, category, quantity, regularPrice, salePrice, publicationDate } = req.body;
+
+    if (!productName || !regularPrice) {
+        return res.status(400).json({ success: false, message: 'Product Name and Regular Price are required.' });
+    }
+
+    db.query('SELECT category_id FROM category WHERE category_type = ?', [category], (err, catRes) => {
+        const categoryId = (catRes && catRes.length > 0) ? catRes[0].category_id : null;
+        const price = parseFloat(regularPrice);
+        const priceDiscount = salePrice ? parseFloat(salePrice) : price;
+        const percent = Math.round((1 - priceDiscount / price) * 100);
+        const qty = parseInt(quantity, 10) || 0;
+        const pubDate = publicationDate ? publicationDate : null;
+
+        if (req.file) {
+            // New image uploaded
+            const imgPath = '/uploads/' + req.file.filename;
+            const qUpdate = `
+                UPDATE product 
+                SET product_name = ?, category_id = ?, category_type = ?, img_url = ?, img_link = ?, percent = ?, price = ?, price_discount = ?, quantity = ?, public_date = ?
+                WHERE product_id = ?
+            `;
+            const params = [productName, categoryId, category, imgPath, imgPath, percent, price, priceDiscount, qty, pubDate, productId];
+            db.query(qUpdate, params, (err2, results) => {
+                if (err2) {
+                    console.error('Error updating product (with image):', err2);
+                    return res.status(500).json({ success: false, message: 'Database error editing product.' });
+                }
+                fetchProducts();
+                res.json({ success: true, message: 'Product updated successfully!' });
+            });
+        } else {
+            // Keep old cover image
+            const qUpdate = `
+                UPDATE product 
+                SET product_name = ?, category_id = ?, category_type = ?, percent = ?, price = ?, price_discount = ?, quantity = ?, public_date = ?
+                WHERE product_id = ?
+            `;
+            const params = [productName, categoryId, category, percent, price, priceDiscount, qty, pubDate, productId];
+            db.query(qUpdate, params, (err2, results) => {
+                if (err2) {
+                    console.error('Error updating product (without image):', err2);
+                    return res.status(500).json({ success: false, message: 'Database error editing product.' });
+                }
+                fetchProducts();
+                res.json({ success: true, message: 'Product updated successfully!' });
+            });
+        }
+    });
 });
 
 //go to top-product
-app.get('/top-product', (req, res) => {
+app.get('/top-product', isAdmin, (req, res) => {
     res.render('admin/top_product', { layout: false });
 });
 
 //go to bill-summary
-app.get('/bill-summary', (req, res) => {
+app.get('/bill-summary', isAdmin, (req, res) => {
     res.render('admin/bill_summary', { layout: false });
 });
 
 //go to staff-login
 app.get('/staff-login', (req, res) => {
+    if (req.session && req.session.admin) {
+        return res.redirect('/dashboard');
+    }
     res.render('admin/staff_login', { layout: false });
 });
 
-//go to staff-order
-app.get('/staff-order', (req, res) => {
-    res.render('admin/staff_order', { layout: false });
+// POST to authenticate admin/staff
+app.post('/staff-login', (req, res) => {
+    const { adminID, password } = req.body;
+
+    if (!adminID || !password) {
+        return res.render('admin/staff_login', { error: 'Please enter both Admin ID and Password', layout: false });
+    }
+
+    db.query('SELECT * FROM staff WHERE admin_id = ? AND password = ?', [adminID, password], (err, results) => {
+        if (err) {
+            console.error('Database error during staff login:', err);
+            return res.render('admin/staff_login', { error: 'Database error. Please try again.', layout: false });
+        }
+
+        if (results.length === 0) {
+            return res.render('admin/staff_login', { error: 'Invalid Admin ID or Password', layout: false });
+        }
+
+        // Login success! Set session
+        req.session.admin = results[0];
+        res.redirect('/dashboard');
+    });
 });
 
 //go to staff-product-dashboard
-app.get('/dashboard', (req, res) => {
-    res.render('admin/dashboard', { layout: false });
+app.get('/dashboard', isAdmin, (req, res) => {
+    const qIncome = "SELECT COALESCE(SUM(total_price), 0) AS total FROM orders WHERE status != 'Returned' AND status != 'Cancelled'";
+    const qOrders = "SELECT COUNT(*) AS total FROM orders";
+    const qProducts = "SELECT COUNT(*) AS total FROM product";
+    const qOutOfStock = "SELECT COUNT(*) AS total FROM product WHERE quantity = 0";
+    
+    // Top 5 best sellers based on sold quantity
+    const qBestSellers = `
+        SELECT p.product_id, p.product_name, p.price, p.img_link, p.img_url, p.category_type, COALESCE(SUM(oi.quantity), 0) AS saleCount
+        FROM product p
+        LEFT JOIN order_items oi ON p.product_id = oi.product_id
+        GROUP BY p.product_id
+        ORDER BY saleCount DESC
+        LIMIT 5
+    `;
+
+    db.query(qIncome, (err, incomeRes) => {
+        db.query(qOrders, (err2, ordersRes) => {
+            db.query(qProducts, (err3, productsRes) => {
+                db.query(qOutOfStock, (err4, outOfStockRes) => {
+                    db.query(qBestSellers, (err5, bestSellersRes) => {
+                        if (err || err2 || err3 || err4 || err5) {
+                            console.error('Error loading dashboard stats:', { err, err2, err3, err4, err5 });
+                            return res.status(500).send('Internal Server Error loading dashboard');
+                        }
+                        
+                        const stats = {
+                            income: incomeRes[0].total,
+                            orders: ordersRes[0].total,
+                            products: productsRes[0].total,
+                            outOfStock: outOfStockRes[0].total
+                        };
+                        
+                        res.render('admin/dashboard', {
+                            stats,
+                            bestSellers: bestSellersRes,
+                            layout: false
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
 //go to staff-product-product
-app.get('/staff-product', (req, res) => {
-    res.render('admin/staff_product', { layout: false });
-});
-//go to staff-product-order
-app.get('/staff-order', (req, res) => {
-    res.render('admin/staff_order', { layout: false });
-});
-//go to staff-product-setting
-app.get('/staff-setting', (req, res) => {
-    res.render('admin/staff_setting', { layout: false });
-});
-
-//go to staff-setting
-app.get('/staff-setting', (req, res) => {
-    res.render('admin/staff_setting', { layout: false });
+app.get('/staff-product', isAdmin, (req, res) => {
+    res.redirect('/manage-product');
 });
 
 
@@ -667,7 +1044,10 @@ app.get('/contact', (req, res) => {
 
 //go to home
 app.get('/home', (req, res) => {
-    res.render('user/home');
+    db.query('SELECT * FROM promotion_groups WHERE is_active = 1 AND end_time > NOW() ORDER BY end_time ASC LIMIT 1', (err, promoResults) => {
+        const activePromoGroup = (promoResults && promoResults.length > 0) ? promoResults[0] : null;
+        res.render('user/home', { product : app.locals.products, activePromoGroup });
+    });
 });
 
 //go to login
