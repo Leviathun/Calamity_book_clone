@@ -1,0 +1,345 @@
+/* payment.css — Premium Payment Page */
+
+/* ============================================
+   PAGE LAYOUT
+   ============================================ */
+.payment-page {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2rem;
+  padding: 2rem 0 3rem;
+  align-items: start;
+}
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+.payment-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #E5E7EB;
+  position: relative;
+}
+.payment-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 60px; height: 2px;
+  background: #0A7C6E;
+}
+.payment-header .header-icon {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 124, 110, 0.1);
+  border-radius: 12px;
+  color: #0A7C6E; font-size: 1.2rem;
+}
+.payment-header h1 {
+  font-size: 1.5rem; font-weight: 800;
+  color: #1F2937; margin: 0;
+}
+
+/* ============================================
+   PAYMENT METHOD (LEFT)
+   ============================================ */
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Method tab selector */
+.method-tabs {
+  display: flex;
+  gap: 0.75rem;
+}
+.method-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 14px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  color: #6B7280;
+}
+.method-tab:hover {
+  border-color: #0A7C6E;
+  color: #0A7C6E;
+}
+.method-tab.active {
+  border-color: #0A7C6E;
+  background: rgba(10, 124, 110, 0.06);
+  color: #0A7C6E;
+  box-shadow: 0 2px 8px rgba(10, 124, 110, 0.12);
+}
+.method-tab i {
+  font-size: 1.25rem;
+}
+
+/* Credit card form */
+.payment-form-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 1.75rem;
+}
+.payment-form-card.hidden {
+  display: none;
+}
+.pf-group {
+  margin-bottom: 1rem;
+}
+.pf-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+.pf-group input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  color: #1F2937;
+  background: #FAFAFA;
+  transition: all 0.3s;
+  outline: none;
+}
+.pf-group input:focus {
+  border-color: #0A7C6E;
+  background: #FFF;
+  box-shadow: 0 0 0 3px rgba(10,124,110,0.1);
+}
+.pf-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* COD panel */
+.cod-panel {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 2.5rem 1.75rem;
+  text-align: center;
+}
+.cod-panel .cod-icon {
+  width: 72px; height: 72px;
+  margin: 0 auto 1rem;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(245,158,11,0.1);
+  border-radius: 50%;
+  font-size: 2rem;
+  color: #F59E0B;
+}
+.cod-panel h3 {
+  font-size: 1.1rem; font-weight: 700;
+  color: #1F2937; margin-bottom: 0.5rem;
+}
+.cod-panel p {
+  font-size: 0.9rem; color: #6B7280;
+  margin: 0;
+}
+
+/* Pay button */
+.btn-pay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0A7C6E 0%, #064E45 100%);
+  color: #FFFFFF;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(10,124,110,0.35);
+}
+.btn-pay:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(10,124,110,0.5);
+}
+
+/* ============================================
+   ORDER SUMMARY (RIGHT)
+   ============================================ */
+.payment-summary {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 1.75rem;
+  position: sticky;
+  top: 100px;
+}
+.payment-summary h2 {
+  font-size: 1.15rem; font-weight: 800;
+  color: #1F2937; margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+/* Item list */
+.ps-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 350px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding-right: 0.25rem;
+}
+.ps-items::-webkit-scrollbar {
+  width: 4px;
+}
+.ps-items::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+.ps-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #F9FAFB;
+  border-radius: 10px;
+}
+.ps-item-img {
+  width: 50px; height: 65px;
+  min-width: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ps-item-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.ps-item-info {
+  flex: 1; min-width: 0;
+}
+.ps-item-info .name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1F2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ps-item-info .qty {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+}
+.ps-item-price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0A7C6E;
+  white-space: nowrap;
+}
+
+/* Summary totals */
+.ps-divider {
+  height: 1px; background: #E5E7EB; margin: 0.5rem 0; border: none;
+}
+.ps-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0;
+}
+.ps-row .label { font-size: 0.9rem; color: #6B7280; font-weight: 500; }
+.ps-row .value { font-size: 0.95rem; color: #1F2937; font-weight: 700; }
+.ps-total {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem 0 0;
+}
+.ps-total .label { font-size: 1rem; color: #1F2937; font-weight: 700; }
+.ps-total .value { font-size: 1.4rem; color: #0A7C6E; font-weight: 800; }
+
+/* ============================================
+   SUCCESS OVERLAY
+   ============================================ */
+.payment-success-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.payment-success-overlay.show {
+  display: flex;
+}
+.success-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  max-width: 400px;
+  animation: successPop 0.4s ease;
+}
+@keyframes successPop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.success-card .check-circle {
+  width: 80px; height: 80px;
+  margin: 0 auto 1.25rem;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(16,185,129,0.1);
+  border-radius: 50%;
+  font-size: 2.5rem;
+  color: #10B981;
+}
+.success-card h2 {
+  font-size: 1.5rem; font-weight: 800;
+  color: #1F2937; margin-bottom: 0.5rem;
+}
+.success-card p {
+  font-size: 0.95rem; color: #6B7280; margin-bottom: 1.5rem;
+}
+.success-card .btn-go-orders {
+  display: inline-flex;
+  align-items: center; gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  background: linear-gradient(135deg, #0A7C6E 0%, #064E45 100%);
+  color: #FFF; border: none; border-radius: 12px;
+  font-size: 0.95rem; font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer; text-decoration: none;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(10,124,110,0.3);
+}
+.success-card .btn-go-orders:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(10,124,110,0.45);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .payment-page {
+    grid-template-columns: 1fr;
+  }
+  .payment-summary { position: static; }
+}

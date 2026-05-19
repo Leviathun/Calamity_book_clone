@@ -1,0 +1,104 @@
+<div class="containers wraper" style="max-width: 800px; margin: 0 auto;">
+  
+  <!-- Back Button -->
+  <div class="mb-4 mt-4">
+    <a href="/my-order" class="btn btn-outline-secondary" style="border-radius: 8px; font-weight: 600;">
+      <i class="fa-solid fa-arrow-left me-2"></i>Back to My Orders
+    </a>
+  </div>
+
+  <!-- Page Header -->
+  <div class="myorder-header" style="border-bottom: none; margin-bottom: 0;">
+    <div class="header-icon">
+      <i class="fa-solid fa-receipt"></i>
+    </div>
+    <h1>Order Details <span class="text-muted fs-5">#<%= order.order_id %></span></h1>
+  </div>
+  
+  <div class="bg-white p-4 rounded-4 shadow-sm border mb-4" style="margin-top: 1.5rem;">
+    <div class="row mb-4">
+      <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="text-muted small mb-1 fw-bold text-uppercase tracking-wide">Order Date</div>
+        <div class="fw-medium text-dark fs-5">
+          <%= new Date(order.order_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+        </div>
+      </div>
+      <div class="col-sm-6 text-sm-end">
+        <div class="text-muted small mb-1 fw-bold text-uppercase tracking-wide">Status</div>
+        <% 
+          let statusBadgeClass = 'bg-secondary';
+          let statusIcon = 'fa-circle';
+          if (order.status === 'Paid') { statusBadgeClass = 'bg-success bg-opacity-10 text-success'; statusIcon = 'fa-circle-check'; }
+          else if (order.status === 'Pending') { statusBadgeClass = 'bg-warning bg-opacity-10 text-warning'; statusIcon = 'fa-clock'; }
+          else if (order.status === 'Shipping') { statusBadgeClass = 'bg-primary bg-opacity-10 text-primary'; statusIcon = 'fa-truck'; }
+          else if (order.status === 'Delivered') { statusBadgeClass = 'bg-success bg-opacity-10 text-success'; statusIcon = 'fa-box-open'; }
+          else if (order.status === 'Returned') { statusBadgeClass = 'bg-danger bg-opacity-10 text-danger'; statusIcon = 'fa-rotate-left'; }
+        %>
+        <span class="badge <%= statusBadgeClass %> px-3 py-2 rounded-pill fs-6">
+          <i class="fa-solid <%= statusIcon %> me-1"></i><%= order.status %>
+        </span>
+      </div>
+    </div>
+    
+    <div class="row mb-4">
+      <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="text-muted small mb-1 fw-bold text-uppercase tracking-wide">Payment Method</div>
+        <div class="fw-medium text-dark">
+          <i class="fa-solid <%= order.payment_method === 'cod' ? 'fa-money-bill-wave' : 'fa-credit-card' %> me-2 text-secondary"></i>
+          <%= order.payment_method === 'cod' ? 'Cash on Delivery' : 'Credit Card' %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipping Address -->
+    <h6 class="fw-bold mb-3 text-dark border-bottom pb-2">
+      <i class="fa-solid fa-location-dot text-danger me-2"></i>Shipping Address
+    </h6>
+    <div class="bg-light p-3 rounded-3 mb-4 border">
+      <% if (address) { %>
+        <p class="mb-1 text-dark fw-medium fs-6"><%= locals.user ? locals.user.name : '' %></p>
+        <p class="mb-1 text-muted"><%= address.address_line %></p>
+        <p class="mb-0 text-muted"><%= address.city %> <%= address.zip_code %></p>
+      <% } else { %>
+        <p class="mb-0 text-muted">No shipping address provided.</p>
+      <% } %>
+    </div>
+
+    <!-- Order Items -->
+    <h6 class="fw-bold mb-3 text-dark border-bottom pb-2">
+      <i class="fa-solid fa-box text-primary me-2"></i>Order Items
+    </h6>
+    <div class="mb-4">
+      <% items.forEach(item => { %>
+        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded-3 border">
+          <a href="/product-page?id=<%= item.product_id %>">
+            <img src="<%= item.img_link || 'https://picsum.photos/100' %>" alt="<%= item.product_name %>" class="rounded shadow-sm me-3" style="width: 70px; height: 90px; object-fit: cover;">
+          </a>
+          <div class="flex-grow-1">
+            <a href="/product-page?id=<%= item.product_id %>" class="text-decoration-none">
+              <h6 class="mb-1 fw-bold text-dark"><%= item.product_name %></h6>
+            </a>
+            <div class="text-muted small">Qty: <%= item.quantity %></div>
+          </div>
+          <div class="fw-bold fs-5" style="color: #0A7C6E;">
+            <i class="fa-solid fa-baht-sign fs-6"></i><%= item.price %>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+    <!-- Total -->
+    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
+      <div class="fw-bold text-dark fs-5">Total Amount</div>
+      <div class="fw-bold fs-3" style="color: #0A7C6E;">
+        <i class="fa-solid fa-baht-sign fs-5"></i><%= order.total_price %>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Additional inline styles for quick formatting without a new CSS file -->
+<style>
+  .tracking-wide { letter-spacing: 0.05em; }
+</style>

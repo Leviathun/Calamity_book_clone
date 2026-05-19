@@ -232,10 +232,11 @@
   border: 2px dashed #E5E7EB;
   border-radius: 16px;
 }
-.cart-empty i {
+.cart-empty > i:first-child {
   font-size: 3rem;
   color: #D1D5DB;
   margin-bottom: 1rem;
+  display: block;
 }
 .cart-empty h3 {
   font-size: 1.25rem;

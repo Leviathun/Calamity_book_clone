@@ -1,0 +1,164 @@
+<div class="containers wraper">
+  <div class="payment-page">
+
+    <!-- Page Header -->
+    <div class="payment-header">
+      <div class="header-icon">
+        <i class="fa-solid fa-credit-card"></i>
+      </div>
+      <h1>Payment</h1>
+    </div>
+
+    <!-- Left: Payment Method -->
+    <div class="payment-methods">
+
+      <!-- Method Tabs -->
+      <div class="method-tabs">
+        <button class="method-tab active" onclick="switchMethod('credit')" id="tab-credit">
+          <i class="fa-solid fa-credit-card"></i> Credit Card
+        </button>
+        <button class="method-tab" onclick="switchMethod('cod')" id="tab-cod">
+          <i class="fa-solid fa-truck"></i> Cash on Delivery
+        </button>
+      </div>
+
+      <!-- Credit Card Form -->
+      <div class="payment-form-card" id="form-credit">
+        <div class="pf-group">
+          <label>Cardholder Name</label>
+          <input type="text" id="cardName" placeholder="e.g. John Doe" value="<%= locals.user ? user.name : '' %>">
+        </div>
+        <div class="pf-group">
+          <label>Card Number</label>
+          <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19"
+                 oninput="this.value = this.value.replace(/[^\d]/g,'').replace(/(.{4})/g,'$1 ').trim()">
+        </div>
+        <div class="pf-row">
+          <div class="pf-group">
+            <label>Expiry Date</label>
+            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"
+                   oninput="this.value = this.value.replace(/[^\d]/g,'').replace(/^(\d{2})(\d)/,'$1/$2')">
+          </div>
+          <div class="pf-group">
+            <label>CVV</label>
+            <input type="password" id="cardCvv" placeholder="•••" maxlength="3">
+          </div>
+        </div>
+        <button class="btn-pay" onclick="processPayment('credit_card')">
+          <i class="fa-solid fa-lock"></i> Pay <i class="fa-solid fa-baht-sign"></i><%= subtotal %>
+        </button>
+      </div>
+
+      <!-- COD Panel -->
+      <div class="payment-form-card hidden" id="form-cod">
+        <div class="cod-panel">
+          <div class="cod-icon">
+            <i class="fa-solid fa-money-bill-wave"></i>
+          </div>
+          <h3>Cash on Delivery</h3>
+          <p>Pay when you receive your order. No online payment required.</p>
+        </div>
+        <button class="btn-pay" style="margin-top: 1.5rem;" onclick="processPayment('cod')">
+          <i class="fa-solid fa-check"></i> Confirm Order — <i class="fa-solid fa-baht-sign"></i><%= subtotal %>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Right: Order Summary -->
+    <div class="payment-summary">
+      <h2>Order Summary</h2>
+
+      <div class="ps-items">
+        <% if (cartItems && cartItems.length > 0) { %>
+          <% cartItems.forEach(item => { %>
+            <div class="ps-item">
+              <div class="ps-item-img">
+                <img src="<%= item.img_link %>" alt="<%= item.product_name %>">
+              </div>
+              <div class="ps-item-info">
+                <div class="name"><%= item.product_name %></div>
+                <div class="qty">Qty: <%= item.quantity %></div>
+              </div>
+              <div class="ps-item-price">
+                <i class="fa-solid fa-baht-sign"></i><%= (item.price_discount || item.price) * item.quantity %>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+
+      <hr class="ps-divider">
+
+      <div class="ps-row">
+        <span class="label">Subtotal (<%= cartItems ? cartItems.length : 0 %> items)</span>
+        <span class="value"><i class="fa-solid fa-baht-sign"></i><%= subtotal %></span>
+      </div>
+      <div class="ps-row">
+        <span class="label">Shipping</span>
+        <span class="value" style="color: #10B981; font-size: 0.85rem;">Free</span>
+      </div>
+      <hr class="ps-divider">
+      <div class="ps-total">
+        <span class="label">Total</span>
+        <span class="value"><i class="fa-solid fa-baht-sign"></i><%= subtotal %></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Success Overlay -->
+<div class="payment-success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="check-circle">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h2>Payment Successful!</h2>
+    <p>Your order has been placed successfully.</p>
+    <a href="/my-order" class="btn-go-orders">
+      <i class="fa-solid fa-bag-shopping"></i> View My Orders
+    </a>
+  </div>
+</div>
+
+<script>
+// Switch payment method
+function switchMethod(method) {
+  document.getElementById('tab-credit').classList.toggle('active', method === 'credit');
+  document.getElementById('tab-cod').classList.toggle('active', method === 'cod');
+  document.getElementById('form-credit').classList.toggle('hidden', method !== 'credit');
+  document.getElementById('form-cod').classList.toggle('hidden', method !== 'cod');
+}
+
+// Process payment
+async function processPayment(method) {
+  // Basic validation for credit card
+  if (method === 'credit_card') {
+    const num = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    const exp = document.getElementById('cardExpiry').value;
+    const cvv = document.getElementById('cardCvv').value;
+    if (num.length < 16 || !exp || cvv.length < 3) {
+      alert('Please fill in all card details.');
+      return;
+    }
+  }
+
+  try {
+    const res = await fetch('/payment/process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payment_method: method })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('successOverlay').classList.add('show');
+    } else {
+      alert(data.message || 'Payment failed. Please try again.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('An error occurred. Please try again.');
+  }
+}
+</script>

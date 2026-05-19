@@ -1,0 +1,313 @@
+/* my-order.css — Premium My Orders + Wishlist Page */
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+.myorder-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin: 2rem 0 1.5rem;
+  border-bottom: 2px solid #E5E7EB;
+  position: relative;
+}
+.myorder-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 60px; height: 2px;
+  background: #0A7C6E;
+}
+.myorder-header .header-icon {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 124, 110, 0.1);
+  border-radius: 12px;
+  color: #0A7C6E; font-size: 1.2rem;
+}
+.myorder-header h1 {
+  font-size: 1.5rem; font-weight: 800;
+  color: #1F2937; margin: 0;
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2rem 0 1rem;
+}
+.section-head-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.section-head-left i {
+  color: #0A7C6E;
+  font-size: 1.1rem;
+}
+.section-head-left h2 {
+  font-size: 1.15rem; font-weight: 800;
+  color: #1F2937; margin: 0;
+}
+.section-head .badge-count {
+  background: rgba(10,124,110,0.1);
+  color: #0A7C6E;
+  font-size: 0.75rem; font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+}
+
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.status-paid {
+  background: rgba(16,185,129,0.1);
+  color: #10B981;
+}
+.status-pending {
+  background: rgba(245,158,11,0.1);
+  color: #D97706;
+}
+.status-shipping {
+  background: rgba(59,130,246,0.1);
+  color: #3B82F6;
+}
+.status-delivered {
+  background: rgba(10,124,110,0.1);
+  color: #0A7C6E;
+}
+.status-returned {
+  background: rgba(239,68,68,0.1);
+  color: #EF4444;
+}
+
+/* ============================================
+   ORDER STATUS CARDS (5 latest)
+   ============================================ */
+.status-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.status-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  transition: all 0.3s ease;
+}
+.status-card:hover {
+  border-color: #0A7C6E;
+  box-shadow: 0 4px 12px rgba(10,124,110,0.08);
+  transform: translateY(-2px);
+}
+.sc-img {
+  width: 56px; height: 72px;
+  min-width: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #F3F4F6;
+}
+.sc-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.sc-info {
+  flex: 1;
+  min-width: 0;
+}
+.sc-info .sc-name {
+  font-size: 0.9rem; font-weight: 700;
+  color: #1F2937;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sc-info .sc-date {
+  font-size: 0.78rem; color: #9CA3AF;
+  margin-top: 0.15rem;
+}
+.sc-price {
+  font-size: 0.95rem; font-weight: 700;
+  color: #0A7C6E;
+  white-space: nowrap;
+  margin-right: 0.5rem;
+}
+
+/* ============================================
+   WISHLIST SECTION
+   ============================================ */
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.wishlist-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+.wishlist-card:hover {
+  border-color: #FF6B35;
+  box-shadow: 0 4px 12px rgba(255,107,53,0.08);
+}
+.wl-img {
+  width: 60px; height: 78px;
+  min-width: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #F3F4F6;
+}
+.wl-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.wl-info {
+  flex: 1; min-width: 0;
+}
+.wl-info .wl-name {
+  font-size: 0.9rem; font-weight: 700;
+  color: #1F2937;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.2rem;
+}
+.wl-info .wl-price {
+  font-size: 0.85rem; font-weight: 700;
+  color: #0A7C6E;
+}
+.wl-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.wl-actions button {
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.wl-btn-cart {
+  background: rgba(10,124,110,0.08);
+  color: #0A7C6E;
+}
+.wl-btn-cart:hover {
+  background: #0A7C6E;
+  color: #FFF;
+}
+.wl-btn-remove {
+  background: rgba(239,68,68,0.08);
+  color: #EF4444;
+}
+.wl-btn-remove:hover {
+  background: #EF4444;
+  color: #FFF;
+}
+
+/* ============================================
+   ORDER HISTORY TABLE
+   ============================================ */
+.history-table-wrap {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 3rem;
+}
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.history-table thead th {
+  background: #F9FAFB;
+  padding: 0.85rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border-bottom: 2px solid #E5E7EB;
+}
+.history-table tbody td {
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: #1F2937;
+  border-bottom: 1px solid #F3F4F6;
+}
+.history-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.history-table tbody tr:hover {
+  background: #F9FAFB;
+  box-shadow: inset 3px 0 0 #0A7C6E;
+}
+.ht-order-id {
+  font-weight: 700;
+  color: #0A7C6E;
+}
+
+/* Empty states */
+.section-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  background: #FFFFFF;
+  border: 2px dashed #E5E7EB;
+  border-radius: 14px;
+  color: #9CA3AF;
+  justify-content: center;
+}
+.section-empty i {
+  font-size: 1.5rem;
+  color: #D1D5DB;
+}
+.section-empty p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .wishlist-grid {
+    grid-template-columns: 1fr;
+  }
+  .history-table-wrap {
+    overflow-x: auto;
+  }
+  .status-card {
+    flex-wrap: wrap;
+  }
+}
