@@ -70,3 +70,51 @@ async function addToCart(productId) {
     showToast('An error occurred. Please try again.', 'error');
   }
 }
+
+// Dynamic Countdown Ticker for active promotions
+document.addEventListener('DOMContentLoaded', function() {
+  const counterEl = document.getElementById('counter');
+  if (!counterEl) return;
+
+  const endTimeStr = counterEl.getAttribute('data-endtime');
+  if (!endTimeStr) return;
+
+  const endTime = new Date(endTimeStr).getTime();
+  const cdHour = document.getElementById('cd_hour');
+  const cdMin = document.getElementById('cd_min');
+  const cdSec = document.getElementById('cd_sec');
+  const expiredEl = document.getElementById('expired');
+
+  if (!cdHour || !cdMin || !cdSec) return;
+
+  const timerInterval = setInterval(function() {
+    const now = new Date().getTime();
+    const diff = endTime - now;
+
+    if (diff <= 0) {
+      clearInterval(timerInterval);
+      cdHour.innerText = "00";
+      cdMin.innerText = "00";
+      cdSec.innerText = "00";
+      
+      if (expiredEl) {
+        expiredEl.style.display = 'block';
+      }
+      
+      // Force reload after 3 seconds to sync updated catalog prices
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+      return;
+    }
+
+    const totalSecs = Math.floor(diff / 1000);
+    const hours = Math.floor(totalSecs / 3600);
+    const minutes = Math.floor((totalSecs % 3600) / 60);
+    const seconds = totalSecs % 60;
+
+    cdHour.innerText = String(hours).padStart(2, '0');
+    cdMin.innerText = String(minutes).padStart(2, '0');
+    cdSec.innerText = String(seconds).padStart(2, '0');
+  }, 1000);
+});
