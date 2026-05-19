@@ -216,6 +216,44 @@ app.get('/my-order', (req, res) => {
     });
 });
 
+// GET order details page
+app.get('/order-details', (req, res) => {
+    if (!req.session.user) return res.redirect('/login');
+    const orderId = req.query.id;
+    if (!orderId) return res.redirect('/my-order');
+    
+    const userId = req.session.user.id;
+
+    // Verify order belongs to user
+    db.query('SELECT * FROM orders WHERE order_id = ? AND user_id = ?', [orderId, userId], (err, orderRes) => {
+        if (err || orderRes.length === 0) return res.redirect('/my-order');
+        
+        const order = orderRes[0];
+
+        // Get items
+        const itemsQuery = `
+            SELECT oi.quantity, oi.price, p.product_name, p.img_link, p.product_id
+            FROM order_items oi
+            JOIN product p ON oi.product_id = p.product_id
+            WHERE oi.order_id = ?
+        `;
+        db.query(itemsQuery, [orderId], (err2, items) => {
+            if (err2) return res.redirect('/my-order');
+
+            // Get user's address
+            db.query('SELECT * FROM address_book WHERE user_id = ? LIMIT 1', [userId], (err3, addrRes) => {
+                const address = (addrRes && addrRes.length > 0) ? addrRes[0] : null;
+
+                res.render('user/order_details', {
+                    order,
+                    items,
+                    address
+                });
+            });
+        });
+    });
+});
+
 //go to my-wishlist (redirect to my-order now)
 app.get('/wishlist', (req, res) => {
     res.redirect('/my-order');

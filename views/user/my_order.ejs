@@ -8,19 +8,41 @@
     <h1>My Orders</h1>
   </div>
 
-  <!-- =============== SECTION 1: ORDER STATUS (5 Latest) =============== -->
-  <div class="section-head">
-    <div class="section-head-left">
-      <i class="fa-solid fa-chart-line"></i>
-      <h2>Recent Orders</h2>
-    </div>
-    <span class="badge-count">Last 5</span>
-  </div>
+  <!-- Tabs Navigation -->
+  <ul class="nav mb-4 custom-tabs" id="myOrderTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-bold px-4 py-3" id="recent-tab" data-bs-toggle="tab" data-bs-target="#recent-pane" type="button" role="tab" aria-controls="recent-pane" aria-selected="true">
+        <i class="fa-solid fa-chart-line me-2"></i>Recent Orders
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold px-4 py-3" id="wishlist-tab" data-bs-toggle="tab" data-bs-target="#wishlist-pane" type="button" role="tab" aria-controls="wishlist-pane" aria-selected="false">
+        <i class="fa-solid fa-heart me-2"></i>My Wishlist
+        <% if (wishlistItems && wishlistItems.length > 0) { %>
+          <span class="badge rounded-pill ms-2" style="background: rgba(10,124,110,0.1); color: #0A7C6E;"><%= wishlistItems.length %></span>
+        <% } %>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold px-4 py-3" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-pane" type="button" role="tab" aria-controls="history-pane" aria-selected="false">
+        <i class="fa-solid fa-clock-rotate-left me-2"></i>Order History
+        <% if (allOrders && allOrders.length > 0) { %>
+          <span class="badge rounded-pill ms-2" style="background: rgba(10,124,110,0.1); color: #0A7C6E;"><%= allOrders.length %></span>
+        <% } %>
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tabs Content -->
+  <div class="tab-content" id="myOrderTabsContent">
+    
+    <!-- =============== SECTION 1: ORDER STATUS (5 Latest) =============== -->
+    <div class="tab-pane fade show active mt-3" id="recent-pane" role="tabpanel" aria-labelledby="recent-tab" tabindex="0">
 
   <% if (recentOrders && recentOrders.length > 0) { %>
     <div class="status-cards">
       <% recentOrders.forEach(order => { %>
-        <div class="status-card">
+        <div class="status-card" onclick="window.location.href='/order-details?id=<%= order.order_id %>'" style="cursor: pointer;">
           <div class="sc-img">
             <img src="<%= order.img_link || 'https://picsum.photos/seed/bk1/200/300' %>" alt="<%= order.product_name || 'Book' %>">
           </div>
@@ -54,16 +76,10 @@
     </div>
   <% } %>
 
-  <!-- =============== SECTION 2: WISHLIST =============== -->
-  <div class="section-head">
-    <div class="section-head-left">
-      <i class="fa-solid fa-heart"></i>
-      <h2>My Wishlist</h2>
-    </div>
-    <% if (wishlistItems && wishlistItems.length > 0) { %>
-      <span class="badge-count"><%= wishlistItems.length %> items</span>
-    <% } %>
-  </div>
+    </div> <!-- End Tab 1 -->
+
+    <!-- =============== SECTION 2: WISHLIST =============== -->
+    <div class="tab-pane fade mt-3" id="wishlist-pane" role="tabpanel" aria-labelledby="wishlist-tab" tabindex="0">
 
   <% if (wishlistItems && wishlistItems.length > 0) { %>
     <div class="wishlist-grid">
@@ -96,16 +112,10 @@
     </div>
   <% } %>
 
-  <!-- =============== SECTION 3: ORDER HISTORY =============== -->
-  <div class="section-head">
-    <div class="section-head-left">
-      <i class="fa-solid fa-clock-rotate-left"></i>
-      <h2>Order History</h2>
-    </div>
-    <% if (allOrders && allOrders.length > 0) { %>
-      <span class="badge-count"><%= allOrders.length %> orders</span>
-    <% } %>
-  </div>
+    </div> <!-- End Tab 2 -->
+
+    <!-- =============== SECTION 3: ORDER HISTORY =============== -->
+    <div class="tab-pane fade mt-3" id="history-pane" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
 
   <% if (allOrders && allOrders.length > 0) { %>
     <div class="history-table-wrap">
@@ -122,7 +132,7 @@
         </thead>
         <tbody>
           <% allOrders.forEach(order => { %>
-            <tr>
+            <tr onclick="window.location.href='/order-details?id=<%= order.order_id %>'" style="cursor: pointer;">
               <td class="ht-order-id">#<%= order.order_id %></td>
               <td><%= new Date(order.order_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
               <td><%= order.item_count %> book<%= order.item_count > 1 ? 's' : '' %></td>
@@ -155,7 +165,45 @@
     </div>
   <% } %>
 
+    </div> <!-- End Tab 3 -->
+  </div> <!-- End Tab Content -->
+
 </div>
+
+<style>
+  /* Custom Tab Styling */
+  .custom-tabs {
+    gap: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    border-bottom: none;
+    padding: 0;
+  }
+  .custom-tabs .nav-item {
+    flex: 1;
+    text-align: center;
+  }
+  .custom-tabs .nav-link {
+    color: #6B7280;
+    border: none;
+    border-bottom: 2px solid #E5E7EB; /* gray line on every tab */
+    background: transparent;
+    border-radius: 0;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+  }
+  .custom-tabs .nav-link:hover {
+    color: #1F2937;
+    border-bottom-color: #9CA3AF;
+  }
+  .custom-tabs .nav-link.active {
+    color: #0A7C6E !important;
+    border-bottom-color: #0A7C6E !important;
+  }
+</style>
 
 <script>
 // Wishlist: Add to cart
