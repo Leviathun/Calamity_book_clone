@@ -262,11 +262,19 @@ app.get('/wishlist', (req, res) => {
 // Remove from wishlist
 app.post('/wishlist/remove', (req, res) => {
     if (!req.session.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
-    const { wishlist_id } = req.body;
-    db.query('DELETE FROM wishlist WHERE wishlist_id = ? AND user_id = ?', [wishlist_id, req.session.user.id], (err) => {
-        if (err) return res.status(500).json({ success: false, message: 'Database error' });
-        res.json({ success: true, message: 'Removed from wishlist' });
-    });
+    const { wishlist_id, product_id } = req.body;
+    
+    if (product_id) {
+        db.query('DELETE FROM wishlist WHERE product_id = ? AND user_id = ?', [product_id, req.session.user.id], (err) => {
+            if (err) return res.status(500).json({ success: false, message: 'Database error' });
+            res.json({ success: true, message: 'Removed from wishlist' });
+        });
+    } else {
+        db.query('DELETE FROM wishlist WHERE wishlist_id = ? AND user_id = ?', [wishlist_id, req.session.user.id], (err) => {
+            if (err) return res.status(500).json({ success: false, message: 'Database error' });
+            res.json({ success: true, message: 'Removed from wishlist' });
+        });
+    }
 });
 
 // ========== PAYMENT ROUTES ==========
@@ -425,15 +433,97 @@ app.post('/account-info/update', (req, res) => {
     });
 });
 
-//go to all-category
+//go to all-books (with advanced dynamic filtering, search, and sorting)
+app.get('/all-books', (req, res) => {
+    const selectedCategory = req.query.category;
+    const selectedTag = req.query.tag; // secondary category e.g., Promotion, Bestseller
+    const searchQuery = req.query.search;
+    const minPrice = req.query.minPrice;
+    const maxPrice = req.query.maxPrice;
+    const sortBy = req.query.sortBy;
+
+    let query = 'SELECT * FROM product WHERE 1=1';
+    const params = [];
+
+    if (selectedCategory && selectedCategory !== 'All category' && selectedCategory !== 'All Books') {
+        query += ' AND category_type = ?';
+        params.push(selectedCategory);
+    }
+
+    if (selectedTag) {
+        query += ' AND secondary_category = ?';
+        params.push(selectedTag);
+    }
+
+    if (searchQuery) {
+        query += ' AND product_name LIKE ?';
+        params.push(`%${searchQuery}%`);
+    }
+
+    if (minPrice) {
+        query += ' AND COALESCE(price_discount, price) >= ?';
+        params.push(parseFloat(minPrice));
+    }
+
+    if (maxPrice) {
+        query += ' AND COALESCE(price_discount, price) <= ?';
+        params.push(parseFloat(maxPrice));
+    }
+
+    // Sorting
+    if (sortBy === 'latest') {
+        query += ' ORDER BY public_date DESC, product_id DESC';
+    } else if (sortBy === 'price_asc') {
+        query += ' ORDER BY COALESCE(price_discount, price) ASC';
+    } else if (sortBy === 'price_desc') {
+        query += ' ORDER BY COALESCE(price_discount, price) DESC';
+    } else if (sortBy === 'rating') {
+        query += ' ORDER BY star DESC';
+    } else {
+        // Default sort: latest
+        query += ' ORDER BY product_id DESC';
+    }
+
+    db.query(query, params, (err, products) => {
+        if (err) {
+            console.error('Error fetching filtered products:', err);
+            return res.render('user/all_category', { 
+                products: [], 
+                selectedCategory: selectedCategory || '',
+                selectedTag: selectedTag || '',
+                searchQuery: searchQuery || '',
+                minPrice: minPrice || '',
+                maxPrice: maxPrice || '',
+                sortBy: sortBy || ''
+            });
+        }
+
+        res.render('user/all_category', { 
+            products, 
+            selectedCategory: selectedCategory || '',
+            selectedTag: selectedTag || '',
+            searchQuery: searchQuery || '',
+            minPrice: minPrice || '',
+            maxPrice: maxPrice || '',
+            sortBy: sortBy || ''
+        });
+    });
+});
+
+// redirect /all-category to /all-books
 app.get('/all-category', (req, res) => {
-    res.render('user/all_category');
+    const queryString = req.url.split('?')[1];
+    if (queryString) {
+        res.redirect('/all-books?' + queryString);
+    } else {
+        res.redirect('/all-books');
+    }
 });
 
 //go to cart-page
 app.get('/cart', (req, res) => {
     if (!req.session.user) {
-        return res.render('user/cart_page', { cartItems: [], subtotal: 0 });
+        return res.render('user/cart_page', { cartItems: [], subtotal: 0, wishlistedProductIds: [] });
     }
 
     const userId = req.session.user.id;
@@ -447,16 +537,25 @@ app.get('/cart', (req, res) => {
     db.query(query, [userId], (err, results) => {
         if (err) {
             console.error('Error fetching cart:', err);
-            return res.render('user/cart_page', { cartItems: [], subtotal: 0 });
+            return res.render('user/cart_page', { cartItems: [], subtotal: 0, wishlistedProductIds: [] });
         }
 
-        let subtotal = 0;
-        results.forEach(item => {
-            const itemPrice = item.price_discount || item.price;
-            subtotal += itemPrice * item.quantity;
-        });
+        // Fetch user's active wishlisted product IDs
+        db.query('SELECT product_id FROM wishlist WHERE user_id = ?', [userId], (err2, wishResults) => {
+            const wishlistedProductIds = !err2 ? wishResults.map(item => item.product_id) : [];
 
-        res.render('user/cart_page', { cartItems: results, subtotal: subtotal });
+            let subtotal = 0;
+            results.forEach(item => {
+                const itemPrice = item.price_discount || item.price;
+                subtotal += itemPrice * item.quantity;
+            });
+
+            res.render('user/cart_page', { 
+                cartItems: results, 
+                subtotal: subtotal, 
+                wishlistedProductIds: wishlistedProductIds 
+            });
+        });
     });
 });
 
@@ -605,7 +704,16 @@ app.get('/product-page', (req, res) => {
             console.error('Error fetching product:', err);
             return res.redirect('/home');
         }
-        res.render('user/product_page', { product: results[0] });
+        const product = results[0];
+        
+        if (req.session.user) {
+            db.query('SELECT * FROM wishlist WHERE user_id = ? AND product_id = ?', [req.session.user.id, productId], (err2, wishResults) => {
+                const isWishlisted = !err2 && wishResults.length > 0;
+                res.render('user/product_page', { product, isWishlisted });
+            });
+        } else {
+            res.render('user/product_page', { product, isWishlisted: false });
+        }
     });
 });
 

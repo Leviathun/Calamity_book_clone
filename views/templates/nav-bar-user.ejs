@@ -1,67 +1,64 @@
 <!--nav bar top start-->
-    <nav class="navbar navbar-expand-lg">
-      
-      <div class="container">
-        <div class="d-flex justify-content-end align-items-center">
-          <a class="navbar-brand" href="/home">
-            <img src="../imgAssets/Logo.png" />
-          </a>
-        </div>
+<nav class="navbar navbar-expand-lg">
+  <div class="container navbar-layout-container">
+    
+    <!-- LEFT: Logo -->
+    <div class="navbar-left">
+      <a class="navbar-brand" href="/home">
+        <img src="../imgAssets/Logo.png" />
+      </a>
+    </div>
 
-
-        <div class="d-flex justify-content-end align-items-center">
-
-          <div>
-            <form role="search">
-              <!--Search bar start-->
-              <div class="search-bar">
-                <!--Dropdown start-->
-                <div class="dropdown">
-                  <div id="drop-text" class="dropdown-text">
-                    <span id="span">All category</span>
-                    <i id="icon" class="fa-solid fa-chevron-down"></i>
-                  </div>
-
-                  <ul id="list-category" class="dropdown-list">
-                    <li class="dropdown-list-item"><a href="/all-category">All category</a></li>
-                    <li class="dropdown-list-item"><a href="/comics">Comics</a></li>
-                    <li class="dropdown-list-item"><a href="/fiction">Fiction & Literature</a></li>
-                    <li class="dropdown-list-item"><a href="lang">Languages</a></li>
-                    <!--add new category-->
-                    <li class="dropdown-list-item"><a href="#">Unknows</a></li>
-                    
-                  </ul>
-                </div>
-                <!--Dropdown start-->
-
-                <!--Search box input start-->
-                <div class="search-box">
-                  <input
-                    type="text"
-                    id="search-input"
-                    placeholder="Find your favorite book..."
-                  />
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <!--Search box input end-->
-              </div>
-              <!--Search bar end-->
-            </form>
+    <!-- CENTER: Centered Search Form (PC & Mobile stacked) -->
+    <div class="navbar-center">
+      <form action="/all-books" method="GET" class="search-form-wrap w-100 d-flex justify-content-center">
+        <div class="search-bar">
+          <!-- Dropdown -->
+          <div class="dropdown">
+            <div id="drop-text" class="dropdown-text">
+              <span id="span"><%= locals.selectedCategory || 'All Books' %></span>
+              <i id="icon" class="fa-solid fa-chevron-down"></i>
+            </div>
+            <input type="hidden" name="category" id="search-category" value="<%= locals.selectedCategory || '' %>">
+            <ul id="list-category" class="dropdown-list">
+              <li class="dropdown-list-item" data-value=""><a href="#">All Books</a></li>
+              <% if (locals.category) { %>
+                <% category.forEach(cat => { %>
+                  <li class="dropdown-list-item" data-value="<%= cat.category_type %>"><a href="#"><%= cat.category_type %></a></li>
+                <% }); %>
+              <% } %>
+            </ul>
           </div>
+          <!-- Search box input -->
+          <div class="search-box">
+            <input
+              type="text"
+              name="search"
+              id="search-input"
+              value="<%= locals.searchQuery || '' %>"
+              placeholder="Find your favorite book..."
+            />
+            <button type="submit" class="search-submit-btn">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
 
-          <!--toggler start-->
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon "></span>
-          </button>
-          <div class="collapse navbar-collapse justify-content-end" id="offcanvasNavbar">
+    <!-- RIGHT: Menu Items & Icons -->
+    <div class="navbar-right">
+      <!-- Mobile Toggler -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-
-          <div class="navbar-icons d-flex ">
-
-            <div class="nav-item resize ">
+      <div class="collapse navbar-collapse" id="offcanvasNavbar">
+        <div class="navbar-icons d-flex">
+          <div class="nav-item resize">
             <% if (locals.user) { %>
               <a class="nav-link active" aria-current="page" href="/account-info" title="My Account">
-                <i class="fa-solid fa-user-check" style="color: #4CAF50;"></i>
+                <i class="fa-solid fa-user"></i>
                 <br>
                 <p><span class="hide"><%= user.name %></span></p>
               </a>
@@ -74,46 +71,139 @@
             <% } %>
           </div>
 
-            <div class="nav-item resize">
-              <a class="nav-link active" aria-current="page" href="/cart">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <br>
-                <p><span class="hide">cart</span></p>
-              </a>
-            </div>
-            <div class="nav-item resize">
-              <a class="nav-link active" aria-current="page" href="/my-order">
-                <i class="fa-solid fa-truck"></i>
-                <br>
-                <p><span class="hide">orders</span></p>
-              </a>
-            </div>
+          <div class="nav-item resize">
+            <a class="nav-link active" aria-current="page" href="/cart">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <br>
+              <p><span class="hide">cart</span></p>
+            </a>
           </div>
-         
 
-          <!--hide in desktop but show in moblie-->
-          <ul class="hide">
-            <li class="nav-item-but">
-              <a class="nav-link active" aria-current="page" href="#Flash sale">Promotion</a>
-            </li>
-            <li class="nav-item-but">
-              <a class="nav-link active" aria-current="page" href="#Best seller">Best seller</a>
-            </li>
-            <li class="nav-item-but">
-              <a class="nav-link active" aria-current="page" href="#New Release">New Release</a>
-            </li>
-            <li class="nav-item-but">
-              <a class="nav-link active" aria-current="page" href="#Highlight">Highlight</a>
-            </li>
-            <li class="nav-item-but">
-              <a class="nav-link active" aria-current="page" href="#Coming Soon">Coming Soon</a>
-            </li>
-          </ul>
-          
+          <div class="nav-item resize">
+            <a class="nav-link active" aria-current="page" href="/my-order">
+              <i class="fa-solid fa-truck"></i>
+              <br>
+              <p><span class="hide">orders</span></p>
+            </a>
+          </div>
         </div>
+
+        <!-- Hidden links for mobile navigation drawer -->
+        <ul class="mobile-drawer-links d-lg-none mt-3">
+          <li class="nav-item-but">
+            <a class="nav-link active" href="/all-books?tag=Promotion">Promotion</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" href="/all-books?tag=Bestseller">Best seller</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" href="/all-books?tag=New%20Release">New Release</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" href="/all-books?tag=Highlight">Highlight</a>
+          </li>
+          <li class="nav-item-but">
+            <a class="nav-link active" href="/all-books?tag=Coming%20Soon">Coming Soon</a>
+          </li>
+        </ul>
       </div>
-     <!--toggler end-->
-      </div> <!-- Close container -->
-    </nav>
-    <!--nav bar top end-->
-   
+    </div>
+
+  </div> <!-- Close container -->
+</nav>
+<!--nav bar top end-->
+
+<!-- Self-contained robust script for navbar search and dropdown interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const dropdownBtn = document.getElementById("drop-text");
+  const list = document.getElementById("list-category");
+  const icon = document.getElementById("icon");
+  const hiddenInput = document.getElementById("search-category");
+  const searchInput = document.getElementById("search-input");
+
+  if (dropdownBtn && list) {
+    dropdownBtn.onclick = function (e) {
+      e.stopPropagation();
+      const isShow = list.classList.contains('show');
+      icon.style.transform = isShow ? "rotate(0deg)" : "rotate(-180deg)";
+      list.classList.toggle("show");
+    };
+
+    window.addEventListener('click', function (e) {
+      if (!dropdownBtn.contains(e.target) && !list.contains(e.target)) {
+        list.classList.remove("show");
+        icon.style.transform = "rotate(0deg)";
+      }
+    });
+
+    const listItems = list.querySelectorAll(".dropdown-list-item");
+    listItems.forEach(item => {
+      item.onclick = function (e) {
+        e.preventDefault();
+        const val = item.getAttribute("data-value");
+        const text = item.textContent.trim();
+        
+        hiddenInput.value = val;
+        dropdownBtn.querySelector('span').innerText = text;
+        
+        if (val === "" || text === "All Books" || text === "All category") {
+          searchInput.placeholder = "Find your favorite book...";
+        } else {
+          searchInput.placeholder = "Your category is " + text + "...";
+        }
+        
+        list.classList.remove("show");
+        icon.style.transform = "rotate(0deg)";
+      };
+    });
+  }
+
+  // --- Dynamic Active Navigation Link Styling ---
+  const currentTag = new URLSearchParams(window.location.search).get('tag');
+
+  // 1. Unified Category/Tag Links (PC Bottom links & Mobile drawer links)
+  const categoryLinks = document.querySelectorAll('.nav-item-bot a, .mobile-drawer-links .nav-item-but a');
+  categoryLinks.forEach(link => {
+    link.classList.remove('active-link');
+    const href = link.getAttribute('href');
+    if (href) {
+      try {
+        const linkUrl = new URL(href, window.location.origin);
+        const linkTag = linkUrl.searchParams.get('tag');
+        if (linkTag && linkTag === currentTag && window.location.pathname === linkUrl.pathname) {
+          link.classList.add('active-link');
+        }
+      } catch (e) {
+        console.error('Error parsing navigation link:', e);
+      }
+    }
+  });
+
+  // 2. Top Header Navigation Icons (User account/login, Cart, Orders)
+  const topLinks = document.querySelectorAll('.navbar-icons .nav-item a');
+  topLinks.forEach(link => {
+    const parentItem = link.closest('.nav-item');
+    if (parentItem) parentItem.classList.remove('active-item');
+    const href = link.getAttribute('href');
+    const path = window.location.pathname;
+    
+    let isMatch = false;
+    if (href) {
+      if (path === href || path.startsWith(href + '/')) {
+        isMatch = true;
+      } else if (href === '/my-order' && (path === '/my-order' || path === '/order-details')) {
+        isMatch = true;
+      } else if (href === '/cart' && (path === '/cart' || path === '/payment')) {
+        isMatch = true;
+      } else if ((href === '/login' || href === '/account-info') && (path === '/login' || path === '/registration' || path === '/account-info')) {
+        isMatch = true;
+      }
+    }
+    
+    if (isMatch) {
+      if (parentItem) parentItem.classList.add('active-item');
+    }
+  });
+});
+</script>

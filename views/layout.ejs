@@ -40,5 +40,44 @@
     <script src="/js/home.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+
+    <!-- Global Premium Toast Container -->
+    <div id="toast-container"></div>
+    <script>
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `custom-toast ${type}`;
+        
+        let iconClass = 'fa-circle-check';
+        if (type === 'error') iconClass = 'fa-circle-xmark';
+        if (type === 'info') iconClass = 'fa-circle-info';
+
+        toast.innerHTML = `
+          <i class="fa-solid ${iconClass}"></i>
+          <span>${message}</span>
+        `;
+
+        container.appendChild(toast);
+
+        // Force a reflow for transition to work
+        toast.offsetHeight;
+
+        // Trigger animation
+        setTimeout(() => {
+          toast.classList.add('show');
+        }, 10);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            toast.remove();
+          }, 400);
+        }, 3000);
+      }
+    </script>
   </body>
 </html>

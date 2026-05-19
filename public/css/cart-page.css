@@ -215,6 +215,10 @@
   background: #FF6B35;
   color: #FFFFFF;
 }
+.btn-cart-wishlist.active {
+  background: #FF6B35;
+  color: #FFFFFF;
+}
 .btn-cart-remove {
   background: rgba(239, 68, 68, 0.08);
   color: #EF4444;

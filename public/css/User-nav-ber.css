@@ -24,11 +24,52 @@ nav {
   z-index: 1000;
 }
 
-.container {
+.navbar > .container, .navbar-layout-container {
   display: flex;
-  flex-wrap: inherit;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.navbar-left {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-center {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.navbar-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@media (max-width: 991px) {
+  .navbar-layout-container {
+    flex-wrap: wrap !important;
+  }
+  .navbar-center {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 0 0 0;
+    margin: 0 auto;
+  }
+  .navbar-right {
+    order: 2;
+  }
+  .search-bar {
+    width: 100% !important;
+  }
 }
 
 /*logo start*/
@@ -69,10 +110,12 @@ nav {
 
 .dropdown {
   position: relative;
-  width: 100%;
+  width: 160px !important;
   border-radius: 50px 0px 0px 50px;
   cursor: pointer;
   background: #FAFAFA;
+  border-right: 1px solid #E5E7EB;
+  flex: 0 0 160px;
 }
 .dropdown-text {
   display: flex;
@@ -248,3 +291,38 @@ nav {
   letter-spacing: inherit;
 }
 /*nav bar bottom end*/
+
+/* Search Submit Button reset to remove default browser outline/black square */
+.search-submit-btn {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dynamic Active Navigation Styling */
+.nav-item-bot a.active-link {
+  color: var(--primary-color) !important;
+  border-bottom: 3px solid var(--nav-accent, #F59E0B) !important;
+  background: #FAFAFA;
+}
+
+/* Mobile drawer active drawer link */
+.mobile-drawer-links .nav-item-but a.active-link {
+  color: var(--nav-accent, #F59E0B) !important;
+  font-weight: bold;
+}
+
+.nav-item.active-item {
+  background: var(--nav-hover-bg) !important;
+  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active-item i {
+  color: var(--nav-accent, #F59E0B) !important;
+}

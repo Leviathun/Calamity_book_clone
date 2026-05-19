@@ -55,7 +55,7 @@
 
                 <!-- Mini action buttons -->
                 <div class="cart-action-btns">
-                  <button class="btn-cart-wishlist" onclick="addToWishlist(<%= item.product_id %>)">
+                  <button class="btn-cart-wishlist <%= (wishlistedProductIds && wishlistedProductIds.includes(item.product_id)) ? 'active' : '' %>" onclick="toggleWishlist(<%= item.product_id %>, this)">
                     <i class="fa-solid fa-heart"></i> Wishlist
                   </button>
                   <button class="btn-cart-remove" onclick="removeCartItem(<%= item.cart_id %>)">
@@ -166,24 +166,41 @@ async function updateCartItem(cartId, quantity) {
   }
 }
 
-// Add to wishlist
-async function addToWishlist(productId) {
+// Toggle Wishlist (Add or Remove dynamically without page refresh)
+async function toggleWishlist(productId, buttonElement) {
+  const isActive = buttonElement.classList.contains('active');
+  const endpoint = isActive ? '/wishlist/remove' : '/wishlist/add';
+
   try {
-    const response = await fetch('/wishlist/add', {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ product_id: productId })
     });
     const result = await response.json();
+
     if (response.status === 401) {
-      alert(result.message);
-      window.location.href = '/login';
+      showToast(result.message, 'error');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
+      return;
+    }
+
+    if (result.success) {
+      if (isActive) {
+        buttonElement.classList.remove('active');
+        showToast('Removed from wishlist', 'info');
+      } else {
+        buttonElement.classList.add('active');
+        showToast('Added to wishlist', 'success');
+      }
     } else {
-      alert(result.message);
+      showToast(result.message, 'error');
     }
   } catch (error) {
     console.error(error);
-    alert('An error occurred. Please try again.');
+    showToast('An error occurred. Please try again.', 'error');
   }
 }
 </script>

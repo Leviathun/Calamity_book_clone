@@ -4,7 +4,7 @@
   <nav class="breadcrumb-nav">
     <a href="/home">Home</a>
     <span class="separator"><i class="fa-solid fa-chevron-right fa-2xs"></i></span>
-    <a href="/all-category"><%= product.category_type %></a>
+    <a href="/all-books?category=<%= product.category_type %>"><%= product.category_type %></a>
     <span class="separator"><i class="fa-solid fa-chevron-right fa-2xs"></i></span>
     <span class="current"><%= product.product_name %></span>
   </nav>
@@ -24,10 +24,18 @@
     <div class="product-info">
       <h1 class="product-title"><%= product.product_name %></h1>
 
-      <span class="category-badge">
-        <i class="fa-solid fa-bookmark"></i>
-        <%= product.category_type %>
-      </span>
+      <div class="product-badges-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+        <span class="category-badge" style="margin-top: 0;">
+          <i class="fa-solid fa-bookmark"></i>
+          <%= product.category_type %>
+        </span>
+        <% if (product.secondary_category) { %>
+        <span class="category-badge secondary-badge" style="margin-top: 0; background-color: #FEF3C7; color: #D97706; border: 1px solid #FCD34D;">
+          <i class="fa-solid fa-tags"></i>
+          <%= product.secondary_category %>
+        </span>
+        <% } %>
+      </div>
 
       <!-- Star Rating -->
       <div class="star-rating">
@@ -83,8 +91,8 @@
           <i class="fa-solid fa-cart-shopping"></i>
           Add to Cart
         </button>
-        <button class="btn-wishlist" type="button" onclick="addToWishlist(<%= product.product_id %>)">
-          <i class="fa-regular fa-heart"></i>
+        <button class="btn-wishlist <%= isWishlisted ? 'active' : '' %>" type="button" onclick="toggleWishlist(<%= product.product_id %>, this)">
+          <i class="<%= isWishlisted ? 'fa-solid' : 'fa-regular' %> fa-heart"></i>
           Wishlist
         </button>
       </div>
@@ -120,6 +128,8 @@
           <span class="info-value"><%= product.category_type %></span>
         </div>
       </div>
+
+
 
       <div class="info-card">
         <div class="info-icon">
@@ -193,37 +203,59 @@ async function addSpecificQuantityToCart(productId) {
     });
     const result = await response.json();
     if (response.status === 401) {
-      alert(result.message);
-      window.location.href = '/login';
+      showToast(result.message, 'error');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
     } else if (result.success) {
-      alert(result.message);
+      showToast(result.message, 'success');
     } else {
-      alert('Failed: ' + result.message);
+      showToast('Failed: ' + result.message, 'error');
     }
   } catch (error) {
     console.error(error);
-    alert('Error adding to cart');
+    showToast('Error adding to cart', 'error');
   }
 }
 
-// Add to wishlist
-async function addToWishlist(productId) {
+// Toggle Wishlist (Add or Remove dynamically without page refresh)
+async function toggleWishlist(productId, buttonElement) {
+  const isActive = buttonElement.classList.contains('active');
+  const endpoint = isActive ? '/wishlist/remove' : '/wishlist/add';
+  const icon = buttonElement.querySelector('i');
+
   try {
-    const response = await fetch('/wishlist/add', {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ product_id: productId })
     });
     const result = await response.json();
+
     if (response.status === 401) {
-      alert(result.message);
-      window.location.href = '/login';
+      showToast(result.message, 'error');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
+      return;
+    }
+
+    if (result.success) {
+      if (isActive) {
+        buttonElement.classList.remove('active');
+        icon.className = 'fa-regular fa-heart';
+        showToast('Removed from wishlist', 'info');
+      } else {
+        buttonElement.classList.add('active');
+        icon.className = 'fa-solid fa-heart';
+        showToast('Added to wishlist', 'success');
+      }
     } else {
-      alert(result.message);
+      showToast(result.message, 'error');
     }
   } catch (error) {
     console.error(error);
-    alert('Error adding to wishlist');
+    showToast('An error occurred. Please try again.', 'error');
   }
 }
 </script>

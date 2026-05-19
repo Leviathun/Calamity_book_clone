@@ -55,16 +55,18 @@ async function addToCart(productId) {
     const result = await response.json();
     
     if (response.status === 401) {
-      alert(result.message);
-      window.location.href = '/login';
+      showToast(result.message, 'error');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
     } else if (result.success) {
-      alert(result.message);
+      showToast(result.message, 'success');
       // Optional: Update cart counter in UI here
     } else {
-      alert('Failed to add to cart: ' + result.message);
+      showToast('Failed to add to cart: ' + result.message, 'error');
     }
   } catch (error) {
     console.error('Error adding to cart:', error);
-    alert('An error occurred. Please try again.');
+    showToast('An error occurred. Please try again.', 'error');
   }
 }

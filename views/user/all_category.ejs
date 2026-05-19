@@ -1,134 +1,428 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>All catagory</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://kit.fontawesome.com/451145afdd.js"
-      crossorigin="anonymous"
-    ></script>
-
-    <link rel="stylesheet" href="css/All-category.css"/>
-    <link rel="stylesheet" href="css/Home.css">
-
-    
-    
+<!-- Premium All Books Catalog Page -->
+<div class="containers wraper" style="margin-top: 40px; margin-bottom: 60px;">
   
-</head>
-  <body>
-
-<%- include('../templates/nav-bar-user') %>
-
-<!--Best seller container start-->
-<!-- Best seller start-->
-<div class="containers wraper" style="margin-top: 50px; margin-bottom: 50px;">
-
-    <div class="bannerTopic">
-      <div class="d-flex flex-column flex-lg-row center">
-          <h2 class="filterflashsale-title">
-            <i class="fa-solid fa-list"></i>
-            All catagory
-          </h2>                
-        </div>
-        
-   
+  <!-- Breadcrumbs & Dynamic Header Banner -->
+  <div class="all-books-banner text-center mb-5 p-5 rounded-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #0A7C6E 0%, #064E45 100%); color: #FFFFFF;">
+    <div class="banner-overlay position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 50%); z-index: 1;"></div>
+    <div class="position-relative" style="z-index: 2;">
+      <span class="text-uppercase fw-bold ls-2" style="font-size: 0.85rem; color: #F59E0B; letter-spacing: 2px;">Catalog</span>
+      <h1 class="display-5 fw-extrabold mt-1 mb-2" style="color: #FFFFFF !important;">
+        <% if (locals.selectedCategory) { %>
+          <span style="color: #FFFFFF !important;">Category:</span> <span style="color: #F59E0B !important;"><%= selectedCategory %></span>
+        <% } else if (locals.selectedTag) { %>
+          <span style="color: #FFFFFF !important;">Collection:</span> <span style="color: #F59E0B !important;"><%= selectedTag %></span>
+        <% } else { %>
+          <span style="color: #FFFFFF !important;">All</span> <span style="color: #F59E0B !important;">Books</span>
+        <% } %>
+      </h1>
+      <p class="lead opacity-90 mx-auto" style="max-width: 600px; font-size: 1rem;">
+        Explore our curated collection of books. Find your next favorite adventure, lesson, or masterpiece.
+      </p>
     </div>
- 
+  </div>
+
+  <!-- Main Catalog Grid Layout -->
+  <div class="row g-4">
     
-    <div class="row">
-      <div class="col-12 col-lg">
-        <div class="products-con-common">
+    <!-- LEFT COLUMN: Advanced Filters Sidebar -->
+    <div class="col-12 col-lg-3">
+      
+      <!-- Mobile Filter Toggle Button -->
+      <button class="btn btn-teal w-100 d-lg-none mb-3 d-flex align-items-center justify-content-center gap-2 py-2" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse" aria-expanded="false" aria-controls="sidebarCollapse">
+        <i class="fa-solid fa-sliders"></i> Toggle Filters
+      </button>
 
-          <!--Best seller Product-card start-->
-        
-   
-  
-  
-            <% products.forEach(product => { %>
-              <div class="products-item">
-                <div class="products-img position-relative">
-                  <a href="/product-page">
-                  <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
-                  </a>
-                  <p class="product-label position-absolute">
-                    <span class="line-1"><%= product.percent %></span> 
-                    <br>
-                    <span class="line-2">OFF</span> 
-                  </p>
-                </div>
-                <div class="products-detail">
-                  <p><span><%= product.product_name %></span></p>
-                  <p><%= product.category_type %></p>
-                </div>
-                <!-- Other product details -->
-                <div class="products-price">
-                  <div class="discount">
-                    <p><i class="fa-solid fa-baht-sign"></i><%= product.price_discount %></p>
-                  </div>
-                  <div class="original">
-                    <p><span class="line-discount"><i class="fa-solid fa-baht-sign "></i><%= product.price %></span></p>
-                  </div>
-                </div>
-                <div class="products-buy">
-                  <div>
-                    <button class="addbag-b"><p>add to bag</p></button>
-                  </div>
-                </div>
+      <div class="collapse d-lg-block" id="sidebarCollapse">
+        <form action="/all-books" method="GET" id="filter-form" class="bg-white p-4 rounded-4 shadow-sm border border-light">
+          
+          <!-- Preserve active search terms -->
+          <% if (locals.searchQuery) { %>
+            <input type="hidden" name="search" value="<%= searchQuery %>">
+            <div class="active-search-badge d-flex align-items-center justify-content-between mb-4 p-2 rounded bg-light border border-light">
+              <span class="small text-muted"><i class="fa-solid fa-magnifying-glass me-1"></i> "<%= searchQuery %>"</span>
+              <a href="/all-books?category=<%= locals.selectedCategory %>&tag=<%= locals.selectedTag %>" class="btn btn-close btn-sm" style="font-size: 0.65rem;" title="Clear search"></a>
+            </div>
+          <% } %>
+
+          <!-- 1. Primary Categories -->
+          <div class="filter-section mb-4">
+            <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">Categories</h6>
+            <div class="d-flex flex-column gap-2">
+              <label class="filter-checkbox-container">
+                <input type="radio" name="category" value="" <%= !locals.selectedCategory ? 'checked' : '' %> onchange="submitFilterForm()">
+                <span class="custom-radio"></span> All Books
+              </label>
+              <% if (locals.category) { %>
+                <% category.forEach(cat => { %>
+                  <label class="filter-checkbox-container">
+                    <input type="radio" name="category" value="<%= cat.category_type %>" <%= locals.selectedCategory === cat.category_type ? 'checked' : '' %> onchange="submitFilterForm()">
+                    <span class="custom-radio"></span> <%= cat.category_type %>
+                  </label>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- 2. Special Collections (Secondary Category) -->
+          <div class="filter-section mb-4">
+            <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">Special Tags</h6>
+            <div class="d-flex flex-column gap-2">
+              <label class="filter-checkbox-container">
+                <input type="radio" name="tag" value="" <%= !locals.selectedTag ? 'checked' : '' %> onchange="submitFilterForm()">
+                <span class="custom-radio"></span> None
+              </label>
+              <% ['Promotion', 'Bestseller', 'New Release', 'Highlight', 'Coming Soon'].forEach(tagName => { %>
+                <label class="filter-checkbox-container">
+                  <input type="radio" name="tag" value="<%= tagName %>" <%= locals.selectedTag === tagName ? 'checked' : '' %> onchange="submitFilterForm()">
+                  <span class="custom-radio"></span> <%= tagName %>
+                </label>
+              <% }); %>
+            </div>
+          </div>
+
+          <!-- 3. Price Range Slider -->
+          <div class="filter-section mb-4">
+            <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">Price Range</h6>
+            <div class="px-2">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Min: ฿<span id="price-min-val"><%= locals.minPrice || 0 %></span></span>
+                <span class="text-muted small">Max: ฿<span id="price-max-val"><%= locals.maxPrice || 2000 %></span></span>
               </div>
-            <% }); %>
-     
-         
-         
-     
+              <div class="range-sliders position-relative mb-3">
+                <input type="range" class="form-range" name="minPrice" id="price-min-input" min="0" max="2000" step="10" value="<%= locals.minPrice || 0 %>" oninput="updatePriceLabels()">
+                <input type="range" class="form-range mt-2" name="maxPrice" id="price-max-input" min="0" max="2000" step="10" value="<%= locals.maxPrice || 2000 %>" oninput="updatePriceLabels()">
+              </div>
+              <button type="submit" class="btn btn-teal-outline btn-sm w-100 py-2">Apply Price Filter</button>
+            </div>
+          </div>
 
+          <!-- 4. Sorting -->
+          <div class="filter-section mb-4">
+            <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">Sort By</h6>
+            <select name="sortBy" class="form-select form-select-sm border-light-subtle rounded-3" style="cursor: pointer;" onchange="submitFilterForm()">
+              <option value="" <%= !locals.sortBy ? 'selected' : '' %>>Default Sorting</option>
+              <option value="latest" <%= locals.sortBy === 'latest' ? 'selected' : '' %>>Latest Arrival</option>
+              <option value="price_asc" <%= locals.sortBy === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+              <option value="price_desc" <%= locals.sortBy === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+              <option value="rating" <%= locals.sortBy === 'rating' ? 'selected' : '' %>>Customer Rating</option>
+            </select>
+          </div>
 
-           
-           
-                
-           
+          <!-- Reset Filter Button -->
+          <a href="/all-books" class="btn btn-danger-outline btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset All Filters
+          </a>
 
-        </div>             
+        </form>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Dynamic Books Grid -->
+    <div class="col-12 col-lg-9">
+      
+      <!-- Catalog Stats Bar -->
+      <div class="catalog-stats-bar bg-white p-3 rounded-4 shadow-sm mb-4 border border-light d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
+        <div class="text-muted small">
+          Showing <span class="fw-bold text-dark"><%= products.length %></span> books found
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <!-- Small helper indicators -->
+          <% if (locals.selectedCategory) { %>
+            <span class="badge bg-teal-subtle text-teal border border-teal-subtle px-3 py-2 rounded-pill"><%= selectedCategory %></span>
+          <% } %>
+          <% if (locals.selectedTag) { %>
+            <span class="badge bg-accent-subtle text-accent border border-accent-subtle px-3 py-2 rounded-pill"><%= selectedTag %></span>
+          <% } %>
+        </div>
       </div>
 
+      <!-- Book Grid Content -->
+      <% if (products && products.length > 0) { %>
+        <div class="products-grid-wrapper row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+          
+          <% products.forEach(product => { %>
+            <div class="col">
+              <div class="product-premium-card h-100 d-flex flex-column bg-white rounded-4 shadow-sm overflow-hidden border border-light position-relative" style="cursor: pointer;" onclick="window.location.href='/product-page?id=<%= product.product_id %>'">
+                
+                <!-- Discount Badge -->
+                <% if (product.percent > 0) { %>
+                  <span class="premium-badge position-absolute bg-danger text-white fw-bold shadow-sm" style="top: 15px; left: 15px; z-index: 10; padding: 6px 12px; border-radius: 50px; font-size: 0.8rem;">
+                    <%= product.percent %>% OFF
+                  </span>
+                <% } %>
+
+                <!-- Special Tag Badge (e.g. Promotion, Bestseller) -->
+                <% if (product.secondary_category) { %>
+                  <span class="premium-badge position-absolute text-white fw-bold shadow-sm" style="top: 15px; right: 15px; z-index: 10; padding: 6px 12px; border-radius: 50px; font-size: 0.8rem; background-color: #F59E0B;">
+                    <%= product.secondary_category %>
+                  </span>
+                <% } %>
+
+                <!-- Image container with Hover Effects -->
+                <div class="product-card-img-wrap position-relative overflow-hidden bg-light d-flex align-items-center justify-content-center" style="height: 280px; padding: 1.5rem;">
+                  <a href="/product-page?id=<%= product.product_id %>" class="d-block w-100 h-100 text-center" onclick="event.stopPropagation();">
+                    <img src="<%= product.img_link %>" alt="<%= product.product_name %>" class="img-fluid h-100 object-fit-contain card-book-image" style="transition: transform 0.4s ease;">
+                  </a>
+                </div>
+
+                <!-- Product Details -->
+                <div class="product-premium-details p-4 d-flex flex-column flex-grow-1">
+                  
+                  <!-- Category type -->
+                  <span class="text-uppercase text-muted fw-bold ls-1 mb-1" style="font-size: 0.75rem; letter-spacing: 1px;"><%= product.category_type %></span>
+                  
+                  <!-- Title -->
+                  <h5 class="fw-bold mb-2 text-dark text-truncate-2" style="font-size: 1.05rem; line-height: 1.4; height: 2.8em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    <a href="/product-page?id=<%= product.product_id %>" class="text-decoration-none text-dark card-title-hover" onclick="event.stopPropagation();"><%= product.product_name %></a>
+                  </h5>
+
+                  <!-- Ratings -->
+                  <div class="rating-wrap d-flex align-items-center gap-1 mb-3">
+                    <div class="stars text-warning d-flex">
+                      <% const fullStars = Math.floor(product.star || 0); %>
+                      <% for (let i = 0; i < 5; i++) { %>
+                        <% if (i < fullStars) { %>
+                          <i class="fa-solid fa-star" style="font-size: 0.8rem;"></i>
+                        <% } else { %>
+                          <i class="fa-regular fa-star" style="font-size: 0.8rem;"></i>
+                        <% } %>
+                      <% } %>
+                    </div>
+                    <span class="text-muted small">(<%= product.star || '0.0' %>)</span>
+                  </div>
+
+                  <!-- Price and Buy Row -->
+                  <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top border-light-subtle">
+                    <div class="price-container">
+                      <% if (product.price_discount && product.price_discount < product.price) { %>
+                        <div class="discounted-price fw-bold text-danger" style="font-size: 1.25rem;">
+                          ฿<%= product.price_discount %>
+                        </div>
+                        <div class="original-price text-muted text-decoration-line-through small" style="font-size: 0.85rem;">
+                          ฿<%= product.price %>
+                        </div>
+                      <% } else { %>
+                        <div class="normal-price fw-bold text-dark" style="font-size: 1.25rem;">
+                          ฿<%= product.price %>
+                        </div>
+                      <% } %>
+                    </div>
+                    
+                    <button class="btn btn-teal btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm card-bag-btn" onclick="event.stopPropagation(); addToCart('<%= product.product_id %>')" style="width: 42px; height: 42px;" title="Add to Bag">
+                      <i class="fa-solid fa-bag-shopping fs-5"></i>
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          <% }); %>
+
+        </div>
+      <% } else { %>
+        <!-- Expanded No Results Panel -->
+        <div class="bg-white rounded-4 shadow-sm border border-light p-5 text-center my-4 d-flex flex-column align-items-center justify-content-center">
+          <div class="mb-4 rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; color: #6B7280;">
+            <i class="fa-solid fa-book-open fs-1 opacity-50"></i>
+          </div>
+          <h3 class="fw-bold text-dark mb-2">No Books Found</h3>
+          <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">
+            We couldn't find any books matching your active filters. Try expanding your search criteria or resetting the filters.
+          </p>
+          <a href="/all-books" class="btn btn-teal px-4 py-2">
+            <i class="fa-solid fa-arrow-rotate-left me-2"></i> Reset Filters
+          </a>
+        </div>
+      <% } %>
+
     </div>
-  </div>
-  <!--Best seller container end-->
-       
-  <!--Pagination start-->
-  <div>
-    <ul class="listPage">
-        <li class="active"> < </li>
-        <li class="active"> 1st Page </li>
-        <li class="active"> > </li>
-    </ul>
 
   </div>
-  <!--Pagination end-->
 
-  <%- include('../templates/user-footer') %>
+</div>
 
-<script src="js/home.js"></script>
-<script src="js/all-category.js"></script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"
-  ></script>
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-  integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-  crossorigin="anonymous"
-></script>
-</body>
+<!-- Styles for All Books Catalog Page -->
+<style>
+  /* Base color design tokens */
+  :root {
+    --primary-teal: #0A7C6E;
+    --primary-teal-hover: #075F54;
+    --accent-orange: #F59E0B;
+    --accent-orange-hover: #D97706;
+  }
 
-</html>
+  .text-teal { color: var(--primary-teal) !important; }
+  .bg-teal-subtle { background-color: rgba(10, 124, 110, 0.1) !important; }
+  .text-accent { color: var(--accent-orange) !important; }
+  .bg-accent-subtle { background-color: rgba(245, 158, 11, 0.1) !important; }
+
+  /* Premium Buttons */
+  .btn-teal {
+    background-color: var(--primary-teal);
+    border-color: var(--primary-teal);
+    color: #FFFFFF;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+  }
+  .btn-teal:hover, .btn-teal:focus {
+    background-color: var(--primary-teal-hover);
+    border-color: var(--primary-teal-hover);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(10, 124, 110, 0.2);
+  }
+  .btn-teal-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary-teal);
+    color: var(--primary-teal);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+  }
+  .btn-teal-outline:hover {
+    background-color: var(--primary-teal);
+    color: #FFFFFF;
+  }
+  .btn-danger-outline {
+    background-color: transparent;
+    border: 2px solid #EF4444;
+    color: #EF4444;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+  }
+  .btn-danger-outline:hover {
+    background-color: #EF4444;
+    color: #FFFFFF;
+  }
+
+  /* Catalog Banner Layout */
+  .all-books-banner {
+    border: none;
+  }
+  .ls-2 { letter-spacing: 2px; }
+
+  /* Premium Card Styles */
+  .product-premium-card {
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  .product-premium-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(10, 124, 110, 0.2) !important;
+  }
+  .product-premium-card:hover .card-book-image {
+    transform: scale(1.06);
+  }
+  .card-title-hover {
+    transition: color 0.2s ease;
+  }
+  .card-title-hover:hover {
+    color: var(--primary-teal) !important;
+  }
+  
+  /* Bag icon button styling */
+  .card-bag-btn {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .card-bag-btn:hover {
+    background-color: var(--accent-orange) !important;
+    border-color: var(--accent-orange) !important;
+    color: #FFFFFF !important;
+    transform: scale(1.15);
+  }
+
+  /* Advanced Sidebar Checkboxes and Radios */
+  .filter-checkbox-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #4B5563;
+    user-select: none;
+    transition: color 0.2s ease;
+  }
+  .filter-checkbox-container:hover {
+    color: var(--primary-teal);
+  }
+  .filter-checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  .custom-radio {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: #F3F4F6;
+    border: 1.5px solid #D1D5DB;
+    border-radius: 50%;
+    transition: all 0.25s ease;
+  }
+  .filter-checkbox-container:hover input ~ .custom-radio {
+    border-color: var(--primary-teal);
+    background-color: rgba(10, 124, 110, 0.05);
+  }
+  .filter-checkbox-container input:checked ~ .custom-radio {
+    background-color: var(--primary-teal);
+    border-color: var(--primary-teal);
+    box-shadow: 0 0 0 3px rgba(10, 124, 110, 0.15);
+  }
+  .custom-radio:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  .filter-checkbox-container input:checked ~ .custom-radio:after {
+    display: block;
+  }
+  .filter-checkbox-container .custom-radio:after {
+    top: 4px;
+    left: 4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  /* Range sliders overlay */
+  .range-sliders input[type="range"] {
+    accent-color: var(--primary-teal);
+  }
+</style>
+
+<!-- Live Slider Updating Script -->
+<script>
+  function updatePriceLabels() {
+    const minVal = document.getElementById("price-min-input").value;
+    const maxVal = document.getElementById("price-max-input").value;
+    
+    // Ensure sliders don't cross
+    if (parseInt(minVal) > parseInt(maxVal)) {
+      document.getElementById("price-min-input").value = maxVal;
+      document.getElementById("price-min-val").innerText = maxVal;
+    } else {
+      document.getElementById("price-min-val").innerText = minVal;
+      document.getElementById("price-max-val").innerText = maxVal;
+    }
+  }
+
+  function submitFilterForm() {
+    document.getElementById("filter-form").submit();
+  }
+  
+  // Make sure sliders display active values on load
+  document.addEventListener('DOMContentLoaded', function() {
+    updatePriceLabels();
+  });
+</script>

@@ -340,6 +340,11 @@
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
 }
+.btn-wishlist.active {
+  background: #FF6B35;
+  color: #FFFFFF;
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+}
 .btn-wishlist:active {
   transform: translateY(-1px);
 }
