@@ -1,64 +1,926 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Products</title>
-    <link rel="stylesheet" href="css/Manage-product.css">
-    <link rel="stylesheet" href="css/Admin-nav-bar.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <title>Inventory Management - Admin Panel</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #0f0f15;
+            color: #e2e8f0;
+            font-family: 'Inter', 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
+        .inventory-container {
+            flex: 1;
+            padding-bottom: 4rem;
+        }
+
+        /* Tabs Styling */
+        .nav-tabs-custom {
+            display: flex;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            gap: 10px;
+            margin-bottom: 2rem;
+            padding: 0;
+            list-style: none;
+        }
+
+        .tab-link-custom {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-link-custom:hover {
+            color: #ff4a5a;
+        }
+
+        .tab-link-custom.active {
+            color: #ff4a5a;
+            border-bottom-color: #ff4a5a;
+        }
+
+        /* Glassmorphic Panel styling */
+        .glass-panel {
+            background: linear-gradient(135deg, #1b1b2f 0%, #161626 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Custom Form Inputs */
+        .form-control-custom {
+            background-color: #0f0f15 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            padding: 0.6rem 1rem !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .form-control-custom:focus {
+            border-color: #ff4a5a !important;
+            box-shadow: 0 0 10px rgba(255, 74, 90, 0.2) !important;
+        }
+
+        .form-select-custom {
+            background-color: #0f0f15 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            padding: 0.6rem 1rem !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .form-select-custom:focus {
+            border-color: #ff4a5a !important;
+            box-shadow: 0 0 10px rgba(255, 74, 90, 0.2) !important;
+        }
+
+        /* Table Styling */
+        .table-custom {
+            width: 100%;
+            margin-bottom: 0;
+            color: #e2e8f0;
+            vertical-align: middle;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .table-custom th {
+            background: none !important;
+            border: none !important;
+            color: #94a3b8 !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            font-size: 0.85rem !important;
+            letter-spacing: 1px !important;
+            padding: 10px 15px !important;
+        }
+
+        .table-custom tbody tr {
+            background-color: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+            transform: scale(1.005);
+        }
+
+        .table-custom td {
+            border: none !important;
+            padding: 15px !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.02) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+        }
+
+        .table-custom td:first-child {
+            border-left: 1px solid rgba(255, 255, 255, 0.02) !important;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .table-custom td:last-child {
+            border-right: 1px solid rgba(255, 255, 255, 0.02) !important;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .book-img {
+            width: 50px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Stock Badges */
+        .badge-stock {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .badge-instock {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .badge-low {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .badge-outofstock {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Buttons styling */
+        .btn-premium {
+            background-color: #ff4a5a;
+            border-color: #ff4a5a;
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 0.6rem 1.25rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 74, 90, 0.3);
+        }
+
+        .btn-premium:hover {
+            background-color: #e03b4a;
+            border-color: #e03b4a;
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(255, 74, 90, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .btn-delete {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+
+        /* Category Grid card */
+        .category-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 74, 90, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal Customization */
+        .modal-content-custom {
+            background-color: #161626 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 16px !important;
+            color: #e2e8f0 !important;
+        }
+
+        .modal-header-custom {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            padding: 1.5rem !important;
+        }
+
+        .modal-footer-custom {
+            border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+            padding: 1.25rem !important;
+        }
+
+        /* Toasts alert styling */
+        .toast-container-custom {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1060;
+        }
+
+        .admin-toast {
+            background-color: #1e1e2e;
+            border-left: 5px solid #ff4a5a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease, fadeOut 0.5s 4.5s forwards;
+            opacity: 1;
+        }
+
+        .admin-toast.success {
+            border-left-color: #10b981;
+        }
+
+        .admin-toast.success i {
+            color: #10b981;
+        }
+
+        .admin-toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .admin-toast.error i {
+            color: #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+    </style>
 </head>
-<body>
-    
-    <%- include('../templates/nav-bar-admin-product') %>
 
-    <div class="container">
-        <h1>Manage Products</h1>
-        <div class="product-category">
-            <label for="category">Product Category:</label>
-            <select id="category">
-                <option value="comics">Comics</option>
-                <option value="fiction">Fiction & Literature</option>
-                <option value="languages">Languages</option>
-            </select>
-        </div>
-        <div class="ellipsis-boxes">
-            <a class="link-secondary nav-link" href="/add-product"><div class="box">Add New Product</div></a>
-            <div class="box2">
-                <div class="ellipsis">Apply</div>
-                <div class="ellipsis">Clear</div>
+<body>
+
+    <!-- Dynamic Alert Toasts -->
+    <div class="toast-container-custom" id="toast-container"></div>
+
+    <!-- Unified Admin Nav-bar -->
+    <%- include('../templates/nav-bar-admin', { activeTab: 'products' }) %>
+
+        <div class="container inventory-container mt-2">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h1 style="font-weight: 800; font-size: 2.25rem; letter-spacing: -0.5px; color: #ffffff;">Inventory
+                        & Warehouse</h1>
+                    <p class="text-muted mb-0">Control book catalog records, restock products, and edit categories
+                        dynamically.</p>
+                </div>
+            </div>
+
+            <!-- Custom SPA Tabs Navigation -->
+            <ul class="nav-tabs-custom">
+                <li><button class="tab-link-custom active" id="tab-books-btn" onclick="switchTab('books')"><i
+                            class="fas fa-book me-2"></i> Books Inventory</button></li>
+                <li><button class="tab-link-custom" id="tab-categories-btn" onclick="switchTab('categories')"><i
+                            class="fas fa-tags me-2"></i> Category Manager</button></li>
+            </ul>
+
+            <!-- TABS PANELS CONTENT -->
+
+            <!-- Tab 1: Books Panel -->
+            <div id="panel-books" class="tab-panel-custom">
+                <div class="glass-panel">
+                    <div class="filter-card">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small fw-bold text-uppercase">Category
+                                    Filter</label>
+                                <select id="category-filter" class="form-select form-select-custom">
+                                    <% categories.forEach(cat=> { %>
+                                        <option value="<%= cat.category_type %>">
+                                            <%= cat.category_type %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label text-muted small fw-bold text-uppercase">Search Name or
+                                    Author</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-muted"><i
+                                            class="fas fa-search"></i></span>
+                                    <input type="text" id="search-input" class="form-control form-control-custom"
+                                        placeholder="Type to search books...">
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-4">
+                                <button class="btn btn-premium w-100 w-md-auto" onclick="openBookModal('add')">
+                                    <i class="fas fa-plus-circle me-2"></i> Add New Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%">#</th>
+                                    <th style="width: 10%">Cover</th>
+                                    <th style="width: 35%">Title & Author</th>
+                                    <th style="width: 10%">ID</th>
+                                    <th style="width: 12%">Price</th>
+                                    <th style="width: 10%">Stock</th>
+                                    <th style="width: 8%">Sales</th>
+                                    <th style="width: 10%" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="books-list-tbody">
+                                <!-- Populated Dynamically via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Custom Pagination Indicator -->
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <span class="text-muted small" id="total-count-label">Showing books</span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled"><a class="page-link bg-dark border-secondary text-muted"
+                                        href="#"><i class="fas fa-chevron-left"></i></a></li>
+                                <li class="page-item active"><a
+                                        class="page-link bg-secondary border-secondary text-white" href="#">1</a></li>
+                                <li class="page-item disabled"><a class="page-link bg-dark border-secondary text-muted"
+                                        href="#"><i class="fas fa-chevron-right"></i></a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Categories Panel -->
+            <div id="panel-categories" class="tab-panel-custom d-none">
+                <div class="glass-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="mb-0 text-white">Registered Book Categories</h4>
+                            <p class="text-muted mb-0 small">Add or monitor tags that users browse categories by.</p>
+                        </div>
+                        <button class="btn btn-premium btn-sm" onclick="openCategoryModal()">
+                            <i class="fas fa-folder-plus me-2"></i> Add Category
+                        </button>
+                    </div>
+
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4" id="categories-grid">
+                        <% categories.forEach(cat=> { %>
+                            <div class="col">
+                                <div class="category-card">
+                                    <img src="<%= cat.img_url || 'https://picsum.photos/seed/' + cat.category_id + '/150/150' %>"
+                                        class="category-icon" alt="<%= cat.category_type %>">
+                                    <h6 class="text-white mb-2">
+                                        <%= cat.category_type %>
+                                    </h6>
+                                    <span class="badge bg-secondary mb-1">ID: <%= cat.category_id %></span>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="panel">
-            <table id="product-table">
-                <thead>
-                    <tr>
-                        <th>Number</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>ID</th>
-                        <th>Price</th>
-                        <th>Sale Count</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="product-list">
-                    <!-- Product rows will be dynamically generated here -->
-                </tbody>
-            </table>
-        </div>
-        <div class="pagination">
-            <i class="fa-solid fa-arrow-left"></i>
-            <div class="page">1</div>
-            <i class="fa-solid fa-arrow-right"></i>
-        </div>
-    </div>
-    
-    <%- include('../templates/footer') %>
 
+        <!-- MODAL: ADD / EDIT BOOK -->
+        <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content modal-content-custom">
+                    <div class="modal-header modal-header-custom">
+                        <h5 class="modal-title fw-bold text-white" id="bookModalLabel">Add New Book</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <form id="bookForm" enctype="multipart/form-data">
+                        <input type="hidden" id="modal-book-id" name="book-id">
+                        <div class="modal-body p-4">
+                            <div class="row g-3">
+                                <!-- Product Name -->
+                                <div class="col-md-8">
+                                    <label class="form-label text-muted small fw-bold">Book Title *</label>
+                                    <input type="text" class="form-control form-control-custom" id="modal-book-name"
+                                        name="product-name" required>
+                                </div>
+                                <!-- Category Selection -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small fw-bold">Category *</label>
+                                    <select class="form-select form-select-custom" id="modal-category" name="category"
+                                        required>
+                                        <% categories.forEach(cat=> { %>
+                                            <option value="<%= cat.category_type %>">
+                                                <%= cat.category_type %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                </div>
 
-<!-- for js DOM -->
-<script src="js/manage-product.js"></script>
+                                <!-- Author -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Author</label>
+                                    <input type="text" class="form-control form-control-custom" id="modal-author"
+                                        name="author">
+                                </div>
+                                <!-- Publication Date -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Publication Date</label>
+                                    <input type="date" class="form-control form-control-custom" id="modal-pub-date"
+                                        name="publication-date">
+                                </div>
+
+                                <!-- Regular Price -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small fw-bold">Regular Price (฿) *</label>
+                                    <input type="number" step="0.01" class="form-control form-control-custom"
+                                        id="modal-regular-price" name="regular-price" required>
+                                </div>
+                                <!-- Sale Price -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small fw-bold">Sale Price (฿)</label>
+                                    <input type="number" step="0.01" class="form-control form-control-custom"
+                                        id="modal-sale-price" name="sale-price">
+                                </div>
+                                <!-- Stock Quantity -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small fw-bold">Quantity in Stock *</label>
+                                    <input type="number" class="form-control form-control-custom" id="modal-quantity"
+                                        name="quantity" required>
+                                </div>
+
+                                <!-- Image Upload & Preview -->
+                                <div class="col-md-12 mt-3">
+                                    <div class="p-3 rounded border border-secondary"
+                                        style="background-color: rgba(255,255,255,0.01);">
+                                        <label class="form-label text-muted small fw-bold d-block">Cover Image
+                                            File</label>
+                                        <input type="file" class="form-control form-control-custom mb-2"
+                                            id="modal-image" name="image" accept="image/*">
+                                        <div class="d-flex align-items-center gap-3 mt-2" id="current-cover-container"
+                                            style="display: none !important;">
+                                            <img src="" id="current-cover-preview" class="rounded"
+                                                style="max-height: 70px; max-width: 50px; object-fit: cover; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                                            <div>
+                                                <small class="text-muted d-block">Current Cover Image</small>
+                                                <small class="text-info fw-bold"
+                                                    id="current-cover-name">cover.jpg</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="col-12 mt-3">
+                                    <label class="form-label text-muted small fw-bold">Book Description</label>
+                                    <textarea class="form-control form-control-custom" id="modal-description"
+                                        name="description" rows="3"
+                                        placeholder="Provide book summary, page details, etc..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer modal-footer-custom">
+                            <button type="button" class="btn btn-outline-secondary px-4 text-white border-secondary"
+                                data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-premium px-5" id="btn-save-book">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: ADD CATEGORY -->
+        <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content modal-content-custom">
+                    <div class="modal-header modal-header-custom">
+                        <h5 class="modal-title fw-bold text-white" id="categoryModalLabel">Add New Category</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <form action="/book/add" method="POST">
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold">Category Title *</label>
+                                <input type="text" class="form-control form-control-custom" name="Category_Name"
+                                    required placeholder="e.g. History, Thriller...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold">Icon / Cover Image Link</label>
+                                <input type="url" class="form-control form-control-custom" name="img_url"
+                                    placeholder="e.g. https://domain.com/category-img.jpg">
+                                <small class="text-muted d-block mt-1">Provide a web address link of a square image icon
+                                    for users to tap.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer modal-footer-custom">
+                            <button type="button" class="btn btn-outline-secondary px-4 text-white border-secondary"
+                                data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-premium px-5">Add Category</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../templates/footer-admin') %>
+
+            <!-- SPA INVENTORY CONTROLLER -->
+            <script>
+                // Modal instance references
+                var bookModalBootstrap = new bootstrap.Modal(document.getElementById('bookModal'));
+                var categoryModalBootstrap = new bootstrap.Modal(document.getElementById('categoryModal'));
+
+                var modalMode = 'add'; // 'add' or 'edit'
+
+                // Display Floating Toast notification
+                function showToast(message, type = 'success') {
+                    const container = document.getElementById('toast-container');
+                    const toast = document.createElement('div');
+                    toast.className = `admin-toast ${type}`;
+
+                    const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+                    toast.innerHTML = `
+                <i class="fas ${icon} fa-lg"></i>
+                <span class="fw-bold">${message}</span>
+            `;
+
+                    container.appendChild(toast);
+
+                    // Auto delete toast item
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 5000);
+                }
+
+                // Custom switch between Books and Categories SPA panels
+                function switchTab(tabName) {
+                    const btnBooks = document.getElementById('tab-books-btn');
+                    const btnCategories = document.getElementById('tab-categories-btn');
+                    const panelBooks = document.getElementById('panel-books');
+                    const panelCategories = document.getElementById('panel-categories');
+
+                    if (tabName === 'categories') {
+                        btnBooks.classList.remove('active');
+                        btnCategories.classList.add('active');
+                        panelBooks.classList.add('d-none');
+                        panelCategories.classList.remove('d-none');
+
+                        // Update URL parameter without reload
+                        history.pushState(null, '', '?tab=categories');
+                    } else {
+                        btnBooks.classList.add('active');
+                        btnCategories.classList.remove('active');
+                        panelBooks.classList.remove('d-none');
+                        panelCategories.classList.add('d-none');
+
+                        history.pushState(null, '', '?tab=books');
+                        // Auto reload active category on switch back
+                        reloadBooksList();
+                    }
+                }
+
+                // Fetch products by category & filters via AJAX
+                function reloadBooksList() {
+                    const category = document.getElementById('category-filter').value;
+                    const search = document.getElementById('search-input').value.toLowerCase().trim();
+                    const tbody = document.getElementById('books-list-tbody');
+                    const countLabel = document.getElementById('total-count-label');
+
+                    if (!category) return;
+
+                    fetch(`/get-products?category=${encodeURIComponent(category)}`)
+                        .then(res => res.json())
+                        .then(products => {
+                            tbody.innerHTML = '';
+
+                            // Filter by name/author Client-Side
+                            const filtered = products.filter(p => {
+                                const name = p.name ? p.name.toLowerCase() : '';
+                                const author = p.author ? p.author.toLowerCase() : '';
+                                return name.includes(search) || author.includes(search);
+                            });
+
+                            if (filtered.length === 0) {
+                                tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="fas fa-book-open fa-3x mb-3 text-secondary"></i>
+                                <p class="mb-0">No books found inside category filter.</p>
+                            </td>
+                        </tr>
+                    `;
+                                countLabel.textContent = `Showing 0 books`;
+                                return;
+                            }
+
+                            filtered.forEach((product, idx) => {
+                                // Stock badge coloring logic
+                                let stockBadge = '';
+                                const qty = parseInt(product.quantity) || 0;
+                                if (qty <= 0) {
+                                    stockBadge = `<span class="badge-stock badge-outofstock">Out of Stock</span>`;
+                                } else if (qty <= 5) {
+                                    stockBadge = `<span class="badge-stock badge-low">Low (${qty})</span>`;
+                                } else {
+                                    stockBadge = `<span class="badge-stock badge-instock">In Stock (${qty})</span>`;
+                                }
+
+                                // Price display logic
+                                let priceDisplay = `<strong>฿${product.price}</strong>`;
+                                if (product.price_discount && parseFloat(product.price_discount) < parseFloat(product.price)) {
+                                    priceDisplay = `
+                            <span class="text-decoration-line-through text-muted small">฿${product.price}</span><br>
+                            <strong class="text-danger">฿${product.price_discount}</strong>
+                        `;
+                                }
+
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td>
+                            <img src="${product.image || 'https://picsum.photos/seed/' + product.id + '/150/220'}" class="book-img" alt="${product.name}">
+                        </td>
+                        <td>
+                            <div class="fw-bold text-white text-truncate" style="max-width: 300px;">${product.name}</div>
+                            <small class="text-muted">${product.author || 'Unknown Author'}</small>
+                        </td>
+                        <td><span class="badge bg-dark text-muted font-monospace">${product.id}</span></td>
+                        <td>${priceDisplay}</td>
+                        <td>${stockBadge}</td>
+                        <td><span class="badge bg-dark px-2 text-info fw-bold">${product.saleCount} sold</span></td>
+                        <td>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button class="btn-edit" onclick="openBookModal('edit', ${product.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn-delete" onclick="deleteBookItem(${product.id})">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                                tbody.appendChild(row);
+                            });
+
+                            countLabel.textContent = `Showing ${filtered.length} books in category "${category}"`;
+                        })
+                        .catch(err => {
+                            console.error("Error fetching books:", err);
+                            showToast("Failed to retrieve books list", "error");
+                        });
+                }
+
+                // Open Book Modal (Handles ADD and EDIT modes)
+                function openBookModal(mode, productId = null) {
+                    modalMode = mode;
+                    const form = document.getElementById('bookForm');
+                    form.reset();
+
+                    // Clear file previews
+                    document.getElementById('current-cover-container').style.setProperty('display', 'none', 'important');
+
+                    if (mode === 'add') {
+                        document.getElementById('bookModalLabel').textContent = 'Add New Book';
+                        document.getElementById('modal-book-id').value = '';
+                        document.getElementById('btn-save-book').textContent = 'Add Book';
+
+                        // Select active category filter as default in selection
+                        const activeCategory = document.getElementById('category-filter').value;
+                        document.getElementById('modal-category').value = activeCategory;
+
+                        bookModalBootstrap.show();
+                    } else if (mode === 'edit') {
+                        document.getElementById('bookModalLabel').textContent = 'Edit Book Details';
+                        document.getElementById('btn-save-book').textContent = 'Save Changes';
+                        document.getElementById('modal-book-id').value = productId;
+
+                        // Load book values from backend API
+                        fetch(`/admin/product/details/${productId}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success && data.product) {
+                                    const book = data.product;
+
+                                    document.getElementById('modal-book-name').value = book.product_name;
+                                    document.getElementById('modal-category').value = book.category_type;
+                                    document.getElementById('modal-author').value = book.author || '';
+                                    document.getElementById('modal-quantity').value = book.quantity;
+                                    document.getElementById('modal-regular-price').value = book.price;
+                                    document.getElementById('modal-sale-price').value = book.price_discount !== null ? book.price_discount : book.price;
+                                    document.getElementById('modal-description').value = book.description || '';
+
+                                    // Parse date properly for html date input
+                                    if (book.public_date) {
+                                        try {
+                                            const isoDate = new Date(book.public_date).toISOString().split('T')[0];
+                                            document.getElementById('modal-pub-date').value = isoDate;
+                                        } catch (e) {
+                                            document.getElementById('modal-pub-date').value = '';
+                                        }
+                                    }
+
+                                    // Display Cover Image Preview
+                                    const coverLink = book.img_link || book.img_url;
+                                    if (coverLink) {
+                                        document.getElementById('current-cover-preview').src = coverLink;
+                                        document.getElementById('current-cover-name').textContent = coverLink.split('/').pop() || 'cover.jpg';
+                                        document.getElementById('current-cover-container').style.setProperty('display', 'flex', 'important');
+                                    }
+
+                                    bookModalBootstrap.show();
+                                } else {
+                                    showToast(data.message || "Failed to load product details", "error");
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Error details:", err);
+                                showToast("Error retrieving product details from server", "error");
+                            });
+                    }
+                }
+
+                // AJAX Form submit for Book Add / Edit
+                document.getElementById('bookForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const productId = document.getElementById('modal-book-id').value;
+                    const name = document.getElementById('modal-book-name').value;
+                    const price = document.getElementById('modal-regular-price').value;
+
+                    if (!name || !name.trim()) {
+                        showToast("Please provide a Book Title!", "error");
+                        return;
+                    }
+                    if (!price) {
+                        showToast("Please provide a Regular Price!", "error");
+                        return;
+                    }
+
+                    const formData = new FormData(this);
+
+                    // Build appropriate URL based on modalMode
+                    const url = modalMode === 'edit' ? `/admin/product/edit/${productId}` : `/submit-product`;
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast(modalMode === 'edit' ? "Book details updated!" : "New book created successfully!");
+                                bookModalBootstrap.hide();
+
+                                // Instantly refresh book table listing
+                                reloadBooksList();
+                            } else {
+                                showToast("Error: " + data.message, "error");
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Submit error:", err);
+                            showToast("An unexpected server error occurred.", "error");
+                        });
+                });
+
+                // Dynamic AJAX Deletion
+                function deleteBookItem(productId) {
+                    if (confirm("Are you sure you want to permanently delete this book record?")) {
+                        fetch('/admin/product/delete', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ id: productId })
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    showToast("Book deleted successfully!");
+                                    // Instantly refresh book table listing
+                                    reloadBooksList();
+                                } else {
+                                    showToast("Error deleting: " + data.message, "error");
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Delete error:", err);
+                                showToast("Could not complete delete operation.", "error");
+                            });
+                    }
+                }
+
+                // Open Add Category Modal
+                function openCategoryModal() {
+                    categoryModalBootstrap.show();
+                }
+
+                // Bind DOM Change handlers
+                document.getElementById('category-filter').addEventListener('change', reloadBooksList);
+                document.getElementById('search-input').addEventListener('input', reloadBooksList);
+
+                // Run on Page Load
+                window.addEventListener('DOMContentLoaded', () => {
+                    // Check URL for active tab parameter
+                    const params = new URLSearchParams(window.location.search);
+                    const tabParam = params.get('tab');
+
+                    if (tabParam === 'categories') {
+                        switchTab('categories');
+                    } else {
+                        switchTab('books');
+                    }
+                });
+            </script>
+</body>
+
+</html>
