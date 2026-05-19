@@ -1,28 +1,52 @@
-<nav class="navbar navbar-expand-md">
-    <div class="card">
-        <div class="card-body">
-            <nav class="navbar navbar-expand-md">
-                <a href="/home" class="navbar-brand"><img class="Nav2Logo" src="ImgAssets/Logo.png"></a>
-                <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar2">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div id="navbar2" class="collapse navbar-collapse">
-                    <ul class="navbar-nav nav nav-tabs card-header-tabs ms-auto">
-                        <li class="nav-item">
-                            <a href="/dashboard" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/staff-product" class="nav-link"><i class="fas fa-box-open"></i> Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/staff-order" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/staff-setting" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+<nav class="navbar navbar-expand-md mb-4 shadow-sm" style="background-color: #1e1e2e; border-bottom: 2px solid #ff4a5a;">
+    <div class="container-fluid px-4">
+        <a href="/dashboard" class="navbar-brand d-flex align-items-center">
+            <img class="Nav2Logo" src="/ImgAssets/Logo.png" alt="Logo" style="height: 40px; margin-right: 10px; filter: drop-shadow(0 0 5px rgba(255, 74, 90, 0.5));">
+            <span style="font-weight: 700; color: #ffffff; letter-spacing: 1px;">CALAMITY <span style="color: #ff4a5a;">ADMIN</span></span>
+        </a>
+        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin" aria-controls="navbarAdmin" aria-expanded="false" aria-label="Toggle navigation" style="border-color: rgba(255,255,255,0.1);">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div id="navbarAdmin" class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0" style="gap: 10px;">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link px-3 py-2 text-white d-flex align-items-center rounded <%= typeof activeTab !== 'undefined' && activeTab === 'dashboard' ? 'active-admin' : '' %>" style="transition: all 0.3s ease;">
+                        <i class="fas fa-chart-line me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/manage-product" class="nav-link px-3 py-2 text-white d-flex align-items-center rounded <%= typeof activeTab !== 'undefined' && activeTab === 'products' ? 'active-admin' : '' %>" style="transition: all 0.3s ease;">
+                        <i class="fas fa-box-open me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/promotions" class="nav-link px-3 py-2 text-white d-flex align-items-center rounded <%= typeof activeTab !== 'undefined' && activeTab === 'promotions' ? 'active-admin' : '' %>" style="transition: all 0.3s ease;">
+                        <i class="fas fa-percentage me-2"></i> Promotions
+                    </a>
+                </li>
+                <li class="nav-item border-start border-secondary ps-2 ms-2">
+                    <a href="/home" class="nav-link px-3 py-2 text-white-50 d-flex align-items-center rounded" style="transition: all 0.3s ease;">
+                        <i class="fas fa-home me-2"></i> User View
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/sign-out" class="nav-link px-3 py-2 text-danger d-flex align-items-center rounded" style="transition: all 0.3s ease;">
+                        <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</nav>    
+</nav>
+
+<style>
+    .nav-link:hover {
+        background-color: rgba(255, 74, 90, 0.1);
+        color: #ff4a5a !important;
+    }
+    .active-admin {
+        background-color: #ff4a5a !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(255, 74, 90, 0.4);
+    }
+</style>
