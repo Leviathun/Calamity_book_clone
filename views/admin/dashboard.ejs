@@ -142,7 +142,27 @@
 
         .table-responsive {
             border-radius: 12px;
-            overflow: hidden;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive .table {
+            min-width: 850px;
+        }
+
+        @media (max-width: 768px) {
+            .section-box {
+                padding: 1.25rem !important;
+                border-radius: 12px !important;
+                margin-top: 1.5rem !important;
+            }
+            .section-title {
+                font-size: 1.1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            .table th, .table td {
+                padding: 0.75rem 0.5rem !important;
+            }
         }
 
         .table {
@@ -191,6 +211,16 @@
             font-weight: 600;
             font-size: 0.85rem;
         }
+        .stats-card-link {
+            display: block;
+            text-decoration: none !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .stats-card-link:hover .stats-card {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 74, 90, 0.15) !important;
+            border-color: rgba(255, 74, 90, 0.3) !important;
+        }
     </style>
 </head>
 
@@ -215,46 +245,52 @@
 
             <!-- KPI Grid -->
             <div class="row g-4">
-                <!-- Revenue Card -->
+                <!-- Revenue Card (Clickable -> History) -->
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="stats-card revenue">
-                        <div>
-                            <div class="stats-value">฿<%= Number(stats.income).toLocaleString(undefined,
-                                    {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
+                    <a href="/admin/history" class="text-decoration-none d-block stats-card-link">
+                        <div class="stats-card revenue">
+                            <div>
+                                <div class="stats-value">฿<%= Number(stats.income).toLocaleString(undefined,
+                                        {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
+                                </div>
+                                <div class="stats-label">Total Revenue</div>
                             </div>
-                            <div class="stats-label">Total Revenue</div>
+                            <div class="stats-icon"><i class="fas fa-wallet"></i></div>
                         </div>
-                        <div class="stats-icon"><i class="fas fa-wallet"></i></div>
-                    </div>
+                    </a>
                 </div>
 
-                <!-- Orders Card -->
+                <!-- Orders Card (Clickable -> History) -->
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="stats-card orders">
-                        <div>
-                            <div class="stats-value">
-                                <%= stats.orders %>
+                    <a href="/admin/history" class="text-decoration-none d-block stats-card-link">
+                        <div class="stats-card orders">
+                            <div>
+                                <div class="stats-value">
+                                    <%= stats.orders %>
+                                </div>
+                                <div class="stats-label">Total Orders</div>
                             </div>
-                            <div class="stats-label">Total Orders</div>
+                            <div class="stats-icon"><i class="fas fa-shopping-bag"></i></div>
                         </div>
-                        <div class="stats-icon"><i class="fas fa-shopping-bag"></i></div>
-                    </div>
+                    </a>
                 </div>
 
-                <!-- Products Card -->
+                <!-- Products Card (Clickable -> Products) -->
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="stats-card products">
-                        <div>
-                            <div class="stats-value">
-                                <%= stats.products %>
+                    <a href="/manage-product" class="text-decoration-none d-block stats-card-link">
+                        <div class="stats-card products">
+                            <div>
+                                <div class="stats-value">
+                                    <%= stats.products %>
+                                </div>
+                                <div class="stats-label">Books Catalog</div>
                             </div>
-                            <div class="stats-label">Books Catalog</div>
+                            <div class="stats-icon"><i class="fas fa-book"></i></div>
                         </div>
-                        <div class="stats-icon"><i class="fas fa-book"></i></div>
-                    </div>
+                    </a>
                 </div>
 
-                <!-- Out of Stock Card -->
+                <!-- Out of Stock Card (Non-clickable) -->
                 <div class="col-12 col-sm-6 col-lg-3">
                     <div class="stats-card stock">
                         <div>
@@ -279,9 +315,10 @@
                                 <th style="width: 80px;">Rank</th>
                                 <th style="width: 100px;">Cover</th>
                                 <th>Book Title</th>
-                                <th>Category</th>
-                                <th class="text-end">Price</th>
-                                <th class="text-end" style="width: 150px;">Total Sold</th>
+                                <th class="text-center">Category</th>
+                                <th class="text-center" style="width: 130px;">Price</th>
+                                <th class="text-center" style="width: 130px;">Sold Price</th>
+                                <th class="text-center" style="width: 130px;">Total Sold</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -309,17 +346,19 @@
                                                 <span class="text-muted" style="font-size: 0.8rem;">ID: <%=
                                                         book.product_id %></span>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 <span class="badge bg-dark text-white border border-secondary"
                                                     style="font-weight: 500; font-size: 0.8rem;">
                                                     <%= book.category_type %>
                                                 </span>
                                             </td>
-                                            <td class="text-end fw-bold text-light">฿<%=
-                                                    Number(book.price).toLocaleString(undefined, {minimumFractionDigits:
-                                                    2}) %>
+                                            <td class="text-center text-muted" style="opacity: 0.75; font-size: 0.95rem;">฿<%=
+                                                    Number(book.price).toLocaleString(undefined, {minimumFractionDigits: 2}) %>
                                             </td>
-                                            <td class="text-end">
+                                            <td class="text-center fw-bold text-success" style="font-size: 1.05rem; text-shadow: 0 0 8px rgba(16, 185, 129, 0.25);">฿<%=
+                                                    Number(book.actualSoldPrice).toLocaleString(undefined, {minimumFractionDigits: 2}) %>
+                                            </td>
+                                            <td class="text-center">
                                                 <span class="badge-sales">
                                                     <%= book.saleCount %> sold
                                                 </span>

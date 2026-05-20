@@ -251,6 +251,7 @@
             font-weight: 600;
             border-bottom: 2px solid transparent;
             transition: all 0.3s ease;
+            margin-bottom: -1px;
         }
 
         .tab-btn.active {
@@ -264,6 +265,7 @@
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            min-width: 850px;
         }
 
         .table-dark-custom th {
@@ -272,12 +274,14 @@
             font-weight: 600;
             border-bottom: 2px solid rgba(255, 255, 255, 0.08);
             padding: 1rem;
+            text-align: center;
         }
 
         .table-dark-custom td {
             padding: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             vertical-align: middle;
+            text-align: center;
         }
 
         .table-dark-custom tr:last-child td {
@@ -338,7 +342,7 @@
 
         <div class="container-fluid px-4 promotions-container">
             <!-- Tab Navigation -->
-            <div class="d-flex align-items-center mb-4 border-bottom border-secondary pb-2" style="gap: 15px;">
+            <div class="d-flex align-items-end mb-4 border-bottom border-secondary" style="gap: 15px;">
                 <button class="tab-btn active" id="tab-create-btn" onclick="switchTab('create')">
                     <i class="fas fa-plus-circle me-1"></i> Create Promotion
                 </button>
@@ -359,7 +363,7 @@
                             </h2>
                             <div class="position-relative">
                                 <input type="text" id="product-search" class="form-control search-bar"
-                                    placeholder="Search book name, author..." oninput="filterProducts()">
+                                    placeholder="Search book name..." oninput="filterProducts()">
                                 <i class="fas fa-search position-absolute text-muted"
                                     style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
                             </div>
@@ -553,12 +557,12 @@
 
         // Hydrate product objects in JS context
         <% products.forEach(product => { %>
-                productsMap[<%= product.product_id %>] = {
-                    id: <%= product.product_id %>,
-                    name: <%- JSON.stringify(product.product_name || '') %>,
-                    price: <%= product.price %>,
-                    percent: 10
-                };
+            productsMap[<%= product.product_id %>] = {
+                id: <%= product.product_id %>,
+                name: <%- JSON.stringify(product.product_name || '') %>,
+                price: <%= product.price %>,
+                percent: 10
+            };
         <% }) %>
 
                 function switchTab(tab) {

@@ -334,11 +334,10 @@ app.get('/get-products', (req, res) => {
         return res.status(400).json({ error: 'Category is required' });
     }
     const qProducts = `
-        SELECT p.product_id AS id, p.product_name AS name, p.price, COALESCE(p.img_link, p.img_url) AS image, COALESCE(SUM(oi.quantity), 0) AS saleCount
+        SELECT p.product_id AS id, p.product_name AS name, p.price, p.price_discount, p.quantity, COALESCE(p.img_link, p.img_url) AS image,
+               (SELECT COALESCE(SUM(oi.quantity), 0) FROM order_items oi WHERE oi.product_id = p.product_id) AS saleCount
         FROM product p
-        LEFT JOIN order_items oi ON p.product_id = oi.product_id
         WHERE p.category_type = ?
-        GROUP BY p.product_id
     `;
     db.query(qProducts, [category], (err, results) => {
         if (err) {
@@ -366,10 +365,16 @@ app.post('/admin/product/delete', (req, res) => {
 
 // Submit Add Product API (Multipart Form upload)
 app.post('/submit-product', uploadFile.single('image'), (req, res) => {
-    const { productName, category, quantity, regularPrice, salePrice, publicationDate } = req.body;
+    const productName = req.body['product-name'];
+    const category = req.body.category;
+    const quantity = req.body.quantity;
+    const priceField = req.body.price || req.body['regular-price'];
+    const secondaryCategory = req.body['secondary-category'] || null;
+    const star = req.body.star ? parseFloat(req.body.star) : 5.0;
+    const publicationDate = req.body['publication-date'];
 
-    if (!productName || !regularPrice) {
-        return res.status(400).json({ success: false, message: 'Product Name and Regular Price are required.' });
+    if (!productName || !priceField) {
+        return res.status(400).json({ success: false, message: 'Product Name and Price are required.' });
     }
 
     // Look up category ID
@@ -384,17 +389,17 @@ app.post('/submit-product', uploadFile.single('image'), (req, res) => {
             imgPath = 'https://picsum.photos/seed/' + Math.floor(Math.random() * 1000) + '/200/300';
         }
 
-        const price = parseFloat(regularPrice);
-        const priceDiscount = salePrice ? parseFloat(salePrice) : price;
-        const percent = Math.round((1 - priceDiscount / price) * 100);
+        const price = parseFloat(priceField);
+        const percent = 0;
+        const priceDiscount = price;
         const qty = parseInt(quantity, 10) || 0;
         const pubDate = publicationDate ? publicationDate : null;
 
         const qInsert = `
-            INSERT INTO product (product_name, category_id, category_type, img_url, img_link, percent, price, price_discount, quantity, public_date, star)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 5.0)
+            INSERT INTO product (product_name, category_id, category_type, img_url, img_link, percent, price, price_discount, quantity, public_date, star, secondary_category)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        const params = [productName, categoryId, category, imgPath, imgPath, percent, price, priceDiscount, qty, pubDate];
+        const params = [productName, categoryId, category, imgPath, imgPath, percent, price, priceDiscount, qty, pubDate, star, secondaryCategory];
 
         db.query(qInsert, params, (err2, results) => {
             if (err2) {
@@ -411,54 +416,73 @@ app.post('/submit-product', uploadFile.single('image'), (req, res) => {
 // Edit Product API (Multipart Form upload)
 app.post('/admin/product/edit/:id', uploadFile.single('image'), (req, res) => {
     const productId = req.params.id;
-    const { productName, category, quantity, regularPrice, salePrice, publicationDate } = req.body;
+    const productName = req.body['product-name'];
+    const category = req.body.category;
+    const quantity = req.body.quantity;
+    const priceField = req.body.price || req.body['regular-price'];
+    const secondaryCategory = req.body['secondary-category'] || null;
+    const star = req.body.star ? parseFloat(req.body.star) : 5.0;
+    const publicationDate = req.body['publication-date'];
 
-    if (!productName || !regularPrice) {
-        return res.status(400).json({ success: false, message: 'Product Name and Regular Price are required.' });
+    if (!productName || !priceField) {
+        return res.status(400).json({ success: false, message: 'Product Name and Price are required.' });
     }
 
     db.query('SELECT category_id FROM category WHERE category_type = ?', [category], (err, catRes) => {
         const categoryId = (catRes && catRes.length > 0) ? catRes[0].category_id : null;
-        const price = parseFloat(regularPrice);
-        const priceDiscount = salePrice ? parseFloat(salePrice) : price;
-        const percent = Math.round((1 - priceDiscount / price) * 100);
+        const price = parseFloat(priceField);
         const qty = parseInt(quantity, 10) || 0;
         const pubDate = publicationDate ? publicationDate : null;
 
-        if (req.file) {
-            // New image uploaded
-            const imgPath = '/uploads/' + req.file.filename;
-            const qUpdate = `
-                UPDATE product 
-                SET product_name = ?, category_id = ?, category_type = ?, img_url = ?, img_link = ?, percent = ?, price = ?, price_discount = ?, quantity = ?, public_date = ?
-                WHERE product_id = ?
-            `;
-            const params = [productName, categoryId, category, imgPath, imgPath, percent, price, priceDiscount, qty, pubDate, productId];
-            db.query(qUpdate, params, (err2, results) => {
-                if (err2) {
-                    console.error('Error updating product (with image):', err2);
-                    return res.status(500).json({ success: false, message: 'Database error editing product.' });
+        // Fetch existing percent and secondary_category to handle active promotions gracefully
+        db.query('SELECT percent, secondary_category FROM product WHERE product_id = ?', [productId], (err3, prodCheck) => {
+            let percent = 0;
+            let priceDiscount = price;
+
+            if (prodCheck && prodCheck.length > 0) {
+                const currentSecCat = prodCheck[0].secondary_category;
+                // If it remains a Promotion, preserve the percentage discount and recalculate priceDiscount based on new base price
+                if (secondaryCategory === 'Promotion' || (!secondaryCategory && currentSecCat === 'Promotion')) {
+                    percent = prodCheck[0].percent || 0;
+                    priceDiscount = price * (1 - percent / 100);
                 }
-                fetchProducts();
-                res.json({ success: true, message: 'Product updated successfully!' });
-            });
-        } else {
-            // Keep old cover image
-            const qUpdate = `
-                UPDATE product 
-                SET product_name = ?, category_id = ?, category_type = ?, percent = ?, price = ?, price_discount = ?, quantity = ?, public_date = ?
-                WHERE product_id = ?
-            `;
-            const params = [productName, categoryId, category, percent, price, priceDiscount, qty, pubDate, productId];
-            db.query(qUpdate, params, (err2, results) => {
-                if (err2) {
-                    console.error('Error updating product (without image):', err2);
-                    return res.status(500).json({ success: false, message: 'Database error editing product.' });
-                }
-                fetchProducts();
-                res.json({ success: true, message: 'Product updated successfully!' });
-            });
-        }
+            }
+
+            if (req.file) {
+                // New image uploaded
+                const imgPath = '/uploads/' + req.file.filename;
+                const qUpdate = `
+                    UPDATE product 
+                    SET product_name = ?, category_id = ?, category_type = ?, img_url = ?, img_link = ?, percent = ?, price = ?, price_discount = ?, quantity = ?, public_date = ?, star = ?, secondary_category = ?
+                    WHERE product_id = ?
+                `;
+                const params = [productName, categoryId, category, imgPath, imgPath, percent, price, priceDiscount, qty, pubDate, star, secondaryCategory, productId];
+                db.query(qUpdate, params, (err2, results) => {
+                    if (err2) {
+                        console.error('Error updating product (with image):', err2);
+                        return res.status(500).json({ success: false, message: 'Database error editing product.' });
+                    }
+                    fetchProducts();
+                    res.json({ success: true, message: 'Product updated successfully!' });
+                });
+            } else {
+                // Keep old cover image
+                const qUpdate = `
+                    UPDATE product 
+                    SET product_name = ?, category_id = ?, category_type = ?, percent = ?, price = ?, price_discount = ?, quantity = ?, public_date = ?, star = ?, secondary_category = ?
+                    WHERE product_id = ?
+                `;
+                const params = [productName, categoryId, category, percent, price, priceDiscount, qty, pubDate, star, secondaryCategory, productId];
+                db.query(qUpdate, params, (err2, results) => {
+                    if (err2) {
+                        console.error('Error updating product (without image):', err2);
+                        return res.status(500).json({ success: false, message: 'Database error editing product.' });
+                    }
+                    fetchProducts();
+                    res.json({ success: true, message: 'Product updated successfully!' });
+                });
+            }
+        });
     });
 });
 
@@ -513,7 +537,9 @@ app.get('/dashboard', isAdmin, (req, res) => {
     
     // Top 5 best sellers based on sold quantity
     const qBestSellers = `
-        SELECT p.product_id, p.product_name, p.price, p.img_link, p.img_url, p.category_type, COALESCE(SUM(oi.quantity), 0) AS saleCount
+        SELECT p.product_id, p.product_name, p.price, p.price_discount, p.img_link, p.img_url, p.category_type, 
+               COALESCE(SUM(oi.quantity), 0) AS saleCount,
+               COALESCE(MIN(oi.price), p.price_discount, p.price) AS actualSoldPrice
         FROM product p
         LEFT JOIN order_items oi ON p.product_id = oi.product_id
         GROUP BY p.product_id
@@ -549,6 +575,56 @@ app.get('/dashboard', isAdmin, (req, res) => {
         });
     });
 });
+
+// admin sales and order history page
+app.get('/admin/history', isAdmin, (req, res) => {
+    const qOrders = `
+        SELECT o.*, u.name AS customer_name, u.email AS customer_email
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.user_id
+        ORDER BY o.order_date DESC
+    `;
+    db.query(qOrders, (err, orders) => {
+        if (err) {
+            console.error('Error loading history orders:', err);
+            return res.status(500).send('Internal Server Error loading history');
+        }
+        
+        const qItems = `
+            SELECT oi.*, p.product_name, p.img_link, p.img_url, p.price AS original_price
+            FROM order_items oi
+            JOIN product p ON oi.product_id = p.product_id
+        `;
+        db.query(qItems, (err2, items) => {
+            if (err2) {
+                console.error('Error loading history order items:', err2);
+                return res.status(500).send('Internal Server Error loading history');
+            }
+            
+            // Map items to their respective orders
+            const ordersWithItems = orders.map(order => {
+                order.items = items.filter(item => item.order_id === order.order_id);
+                return order;
+            });
+
+            // Calculate total realized revenue (exclude Returned/Cancelled)
+            let totalRevenue = 0;
+            orders.forEach(order => {
+                if (order.status !== 'Returned' && order.status !== 'Cancelled') {
+                    totalRevenue += Number(order.total_price);
+                }
+            });
+
+            res.render('admin/history', {
+                orders: ordersWithItems,
+                totalRevenue,
+                activeTab: 'history',
+                layout: false
+            });
+        });
+    });
+});
+
 //go to staff-product-product
 app.get('/staff-product', isAdmin, (req, res) => {
     res.redirect('/manage-product');
@@ -729,10 +805,31 @@ app.post('/payment/process', (req, res) => {
                     (err3) => {
                         if (err3) return res.status(500).json({ success: false, message: 'Error saving order items' });
 
-                        // Clear cart
-                        db.query('DELETE FROM shopping_cart WHERE user_id = ?', [userId], (err4) => {
-                            res.json({ success: true, message: 'Payment successful!', orderId });
-                        });
+                        // Decrement stock for purchased products
+                        const decrementStock = (index) => {
+                            if (index >= cartItems.length) {
+                                // Clear cart
+                                db.query('DELETE FROM shopping_cart WHERE user_id = ?', [userId], (err4) => {
+                                    // Update app.locals.products cache
+                                    fetchProducts();
+                                    res.json({ success: true, message: 'Payment successful!', orderId });
+                                });
+                                return;
+                            }
+                            const item = cartItems[index];
+                            db.query(
+                                'UPDATE product SET quantity = GREATEST(0, quantity - ?) WHERE product_id = ?',
+                                [item.quantity, item.product_id],
+                                (errDec) => {
+                                    if (errDec) {
+                                        console.error('Error decrementing stock for product ID:', item.product_id, errDec);
+                                    }
+                                    decrementStock(index + 1);
+                                }
+                            );
+                        };
+
+                        decrementStock(0);
                     }
                 );
             }

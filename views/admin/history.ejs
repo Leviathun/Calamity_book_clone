@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales & Order History - Calamity Admin</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #0f0f15;
+            color: #e2e8f0;
+            font-family: 'Inter', 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-container {
+            flex: 1;
+            padding-bottom: 3rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #1b1b2f 0%, #161626 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stats-card.revenue::before {
+            background-color: #10b981;
+        }
+
+        .stats-card.orders::before {
+            background-color: #3b82f6;
+        }
+
+        .stats-icon {
+            font-size: 2.25rem;
+            opacity: 0.8;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .revenue .stats-icon {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .orders .stats-icon {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .stats-value {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+            color: #ffffff;
+        }
+
+        .stats-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .section-box {
+            background-color: #161626;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+        }
+
+        .section-title i {
+            color: #ff4a5a;
+        }
+
+        .table-responsive {
+            border-radius: 12px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive .table {
+            min-width: 850px;
+        }
+
+        @media (max-width: 768px) {
+            .section-box {
+                padding: 1.25rem !important;
+                border-radius: 12px !important;
+                margin-top: 1.5rem !important;
+            }
+            .section-title {
+                font-size: 1.1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            .table th, .table td {
+                padding: 0.75rem 0.5rem !important;
+            }
+        }
+
+        .table {
+            background-color: #1b1b2f;
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+            color: #e2e8f0;
+        }
+
+        .table th {
+            background-color: #131322 !important;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-color: rgba(255, 255, 255, 0.03);
+            vertical-align: middle;
+            background-color: #161626;
+        }
+
+        .table tr:hover td {
+            background-color: #1d1d35 !important;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        
+        .status-paid {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-shipping {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-delivered {
+            background-color: rgba(139, 92, 246, 0.15);
+            color: #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-returned {
+            background-color: rgba(100, 116, 139, 0.15);
+            color: #64748b;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+
+        .status-cancelled {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-view-details {
+            background-color: rgba(255, 74, 90, 0.1);
+            color: #ff4a5a;
+            border: 1px solid rgba(255, 74, 90, 0.3);
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view-details:hover {
+            background-color: #ff4a5a;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(255, 74, 90, 0.4);
+            border-color: #ff4a5a;
+        }
+
+        /* Glassmorphic Modal */
+        .glass-modal .modal-content {
+            background-color: #161626;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            color: #e2e8f0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        .glass-modal .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+        }
+
+        .glass-modal .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-modal .modal-title {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .modal-item-img {
+            width: 45px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.25rem;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('../templates/nav-bar-admin', { activeTab: 'history' }) %>
+
+    <div class="container dashboard-container mt-4">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-6">
+                <h1 style="font-weight: 800; font-size: 2.25rem; letter-spacing: -0.5px; color: #ffffff;">Sales History</h1>
+                <p class="text-muted mb-0">Monitor all client transactions and aggregate real paid revenue.</p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <span class="badge bg-secondary px-3 py-2 text-uppercase"
+                    style="letter-spacing: 1px; font-weight: 600; background-color: rgba(255,255,255,0.08) !important;">
+                    <i class="fas fa-file-invoice-dollar me-2"></i> Audit Ledger
+                </span>
+            </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="row g-4">
+            <!-- Total Paid Revenue Card -->
+            <div class="col-12 col-sm-6">
+                <div class="stats-card revenue">
+                    <div>
+                        <div class="stats-value" style="text-shadow: 0 0 15px rgba(16, 185, 129, 0.3);">
+                            ฿<%= Number(totalRevenue).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
+                        </div>
+                        <div class="stats-label">Total Realized Revenue (เงินที่จ่ายจริงรวม)</div>
+                    </div>
+                    <div class="stats-icon"><i class="fas fa-coins"></i></div>
+                </div>
+            </div>
+
+            <!-- Total Transactions Card -->
+            <div class="col-12 col-sm-6">
+                <div class="stats-card orders">
+                    <div>
+                        <div class="stats-value" style="text-shadow: 0 0 15px rgba(59, 130, 246, 0.3);">
+                            <%= orders.length %>
+                        </div>
+                        <div class="stats-label">Total Transactions</div>
+                    </div>
+                    <div class="stats-icon"><i class="fas fa-receipt"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Ledger Section -->
+        <div class="section-box">
+            <h2 class="section-title"><i class="fas fa-list-check"></i> Orders Audit Ledger</h2>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">Order ID</th>
+                            <th class="text-center">Order Date</th>
+                            <th class="text-center">Customer Name</th>
+                            <th class="text-center">Customer Email</th>
+                            <th class="text-center">Payment Method</th>
+                            <th class="text-center" style="width: 140px;">Amount Paid</th>
+                            <th class="text-center" style="width: 150px;">Status</th>
+                            <th class="text-center" style="width: 150px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders.length === 0) { %>
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">No order records found in the database.</td>
+                            </tr>
+                        <% } else { %>
+                            <% orders.forEach((order) => { %>
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold text-white">#<%= order.order_id %></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <%= new Date(order.order_date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-light fw-bold"><%= order.customer_name || 'Guest User' %></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-muted"><%= order.customer_email || 'N/A' %></span>
+                                    </td>
+                                    <td class="text-center text-uppercase">
+                                        <span class="badge bg-dark border border-secondary text-white-50 py-2 px-3" style="font-size: 0.75rem;">
+                                            <i class="<%= order.payment_method === 'credit_card' ? 'far fa-credit-card me-1 text-info' : 'fas fa-hand-holding-dollar me-1 text-warning' %>"></i>
+                                            <%= order.payment_method === 'credit_card' ? 'Online Pay' : 'COD' %>
+                                        </span>
+                                    </td>
+                                    <td class="text-center fw-bold text-success" style="font-size: 1.05rem;">
+                                        ฿<%= Number(order.total_price).toLocaleString(undefined, {minimumFractionDigits: 2}) %>
+                                    </td>
+                                    <td class="text-center">
+                                        <% 
+                                            let statusClass = 'status-pending';
+                                            if (order.status === 'Paid') statusClass = 'status-paid';
+                                            else if (order.status === 'Shipping') statusClass = 'status-shipping';
+                                            else if (order.status === 'Delivered') statusClass = 'status-delivered';
+                                            else if (order.status === 'Returned') statusClass = 'status-returned';
+                                            else if (order.status === 'Cancelled') statusClass = 'status-cancelled';
+                                        %>
+                                        <span class="status-badge <%= statusClass %>">
+                                            <%= order.status %>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-view-details" onclick="openOrderDetailsModal(<%= order.order_id %>)">
+                                            <i class="fas fa-eye me-1"></i> View Items
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items Modal -->
+    <div class="modal fade glass-modal" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">
+                        <i class="fas fa-circle-info text-danger me-2"></i>Order Invoice Details
+                    </h5>
+                    <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Invoice Info Summary -->
+                    <div class="row mb-4 g-3">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Customer Name</p>
+                            <h6 class="fw-bold text-white mb-0" id="modalCustomerName">-</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Order Date</p>
+                            <h6 class="fw-bold text-white mb-0" id="modalOrderDate">-</h6>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <p class="mb-1 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Payment Method</p>
+                            <h6 class="fw-bold text-white mb-0" id="modalPaymentMethod">-</h6>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <p class="mb-1 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Invoice Status</p>
+                            <span class="status-badge d-inline-block mt-1" id="modalStatus">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Items Grid List -->
+                    <h6 class="fw-bold text-white mb-3 mt-4 border-bottom border-secondary pb-2">
+                        <i class="fas fa-book-open me-2 text-danger"></i>Items Purchased
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle" style="background-color: #12121f;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Cover</th>
+                                    <th>Title</th>
+                                    <th class="text-center" style="width: 100px;">Original Price</th>
+                                    <th class="text-center" style="width: 100px;">Sold Price</th>
+                                    <th class="text-center" style="width: 80px;">Qty</th>
+                                    <th class="text-end" style="width: 130px;">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalItemsBody">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Invoice Total Bottom Bar -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 p-3 rounded" style="background-color: rgba(255, 74, 90, 0.05); border: 1px dashed rgba(255, 74, 90, 0.25);">
+                        <span class="fw-bold text-white-50" style="font-size: 1rem;">Total Actual Revenue Received</span>
+                        <span class="fw-bold text-success" style="font-size: 1.5rem;" id="modalTotalPaid">฿0.00</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="background-color: rgba(255,255,255,0.08); border: none; font-weight: 600; border-radius: 8px;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../templates/footer-admin') %>
+
+    <!-- Inject orders details directly into Javascript for instant view without AJAX lag -->
+    <script>
+        const ordersData = <%- JSON.stringify(orders) %>;
+        
+        let detailsModal;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            detailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+        });
+
+        function openOrderDetailsModal(orderId) {
+            const order = ordersData.find(o => o.order_id === orderId);
+            if (!order) return;
+
+            // Populate summary details
+            document.getElementById('orderDetailsModalLabel').innerHTML = `<i class="fas fa-receipt text-danger me-2"></i>Order Invoice Details: #${order.order_id}`;
+            document.getElementById('modalCustomerName').textContent = order.customer_name || 'Guest User';
+            document.getElementById('modalOrderDate').textContent = new Date(order.order_date).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' });
+            document.getElementById('modalPaymentMethod').textContent = order.payment_method === 'credit_card' ? 'Online Pay (Credit/Debit Card)' : 'Cash on Delivery (COD)';
+            
+            // Set status badge style
+            const statusEl = document.getElementById('modalStatus');
+            statusEl.textContent = order.status;
+            statusEl.className = 'status-badge';
+            if (order.status === 'Paid') statusEl.classList.add('status-paid');
+            else if (order.status === 'Shipping') statusEl.classList.add('status-shipping');
+            else if (order.status === 'Delivered') statusEl.classList.add('status-delivered');
+            else if (order.status === 'Returned') statusEl.classList.add('status-returned');
+            else if (order.status === 'Cancelled') statusEl.classList.add('status-cancelled');
+            else statusEl.classList.add('status-pending');
+
+            // Populate items grid
+            const itemsBody = document.getElementById('modalItemsBody');
+            itemsBody.innerHTML = '';
+            
+            order.items.forEach(item => {
+                const tr = document.createElement('tr');
+                
+                const coverUrl = item.img_link || item.img_url || 'https://picsum.photos/seed/placeholder/200/300';
+                const originalPrice = Number(item.original_price).toFixed(2);
+                const soldPrice = Number(item.price).toFixed(2);
+                const qty = item.quantity;
+                const subtotal = (Number(item.price) * qty).toFixed(2);
+
+                tr.innerHTML = `
+                    <td>
+                        <img src="${coverUrl}" alt="${item.product_name}" class="modal-item-img">
+                    </td>
+                    <td>
+                        <div class="fw-bold text-white">${item.product_name}</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">ID: ${item.product_id}</span>
+                    </td>
+                    <td class="text-center text-muted" style="text-decoration: line-through; opacity: 0.6; font-size: 0.85rem;">
+                        ฿${Number(originalPrice).toLocaleString()}
+                    </td>
+                    <td class="text-center fw-bold text-white-50" style="font-size: 0.95rem;">
+                        ฿${Number(soldPrice).toLocaleString()}
+                    </td>
+                    <td class="text-center fw-bold text-info">${qty}</td>
+                    <td class="text-end fw-bold text-success" style="font-size: 1rem;">
+                        ฿${Number(subtotal).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                    </td>
+                `;
+                itemsBody.appendChild(tr);
+            });
+
+            // Set final total price
+            document.getElementById('modalTotalPaid').textContent = `฿${Number(order.total_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            // Show the modal
+            detailsModal.show();
+        }
+    </script>
+</body>
+
+</html>
