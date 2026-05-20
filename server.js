@@ -37,11 +37,33 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// middleware to pass user session to templates
+// middleware to pass user session and dynamic category/product data to templates
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     res.locals.admin = req.session.admin || null;
-    next();
+
+    db.query('SELECT * FROM category', (err1, categories) => {
+        if (err1) {
+            console.error('Error fetching categories in middleware:', err1);
+            res.locals.category = [];
+            app.locals.category = [];
+        } else {
+            res.locals.category = categories;
+            app.locals.category = categories;
+        }
+
+        db.query('SELECT * FROM product', (err2, products) => {
+            if (err2) {
+                console.error('Error fetching products in middleware:', err2);
+                res.locals.products = [];
+                app.locals.products = [];
+            } else {
+                res.locals.products = products;
+                app.locals.products = products;
+            }
+            next();
+        });
+    });
 });
 
 // Middleware to protect admin routes
@@ -171,7 +193,7 @@ app.post('/book/add', (req, res) => {
             return;
         }
 
-
+        fetchCategory(); // Refresh cached category list
         res.redirect('/manage-product?tab=categories');
         
     });
