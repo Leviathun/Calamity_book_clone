@@ -87,24 +87,6 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE CASCADE
 );
 
--- 9. Track Order
-CREATE TABLE IF NOT EXISTS track_order (
-    track_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    tracking_number VARCHAR(100),
-    status VARCHAR(100),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
-);
-
--- 10. Dashboard Stats (Optional summary table)
-CREATE TABLE IF NOT EXISTS dashboard (
-    dashboard_id INT AUTO_INCREMENT PRIMARY KEY,
-    total_sales DECIMAL(15,2) DEFAULT 0,
-    total_orders INT DEFAULT 0,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
 -- INSERT DUMMY DATA FOR TESTING
 INSERT INTO category (category_type, img_url) VALUES 
 ('Fiction', 'https://picsum.photos/seed/cat1/200/300'),

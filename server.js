@@ -144,7 +144,6 @@ function fetchProducts() {
             console.error('Error fetching products:', err);
             return;
         }
-        /*console.log('Products:', results);*/
         // Pass products to render
         app.locals.products = results;
     });
@@ -165,14 +164,13 @@ app.post('/book/add', (req, res) => {
     const sql = "INSERT INTO category (category_type,img_url) VALUES (?, ?)";
     const values = [Category_Name,img_url];
 
-    console.log(values);
     db.query(sql, values, (error, results, fields) => {
         if (error) {
             console.error('Error inserting data into database:', error);
             res.status(500).send('Internal Server Error');
             return;
         }
-        console.log('Data inserted successfully:', results);
+
 
         res.redirect('/manage-product?tab=categories');
         
@@ -186,8 +184,7 @@ function fetchCategory() {
             console.error('Error fetching category:', err);
             return;
         }
-        console.log('category:', results);
-        // Pass products to render
+        // Pass category to render
         app.locals.category = results;
     });
 }
@@ -486,15 +483,6 @@ app.post('/admin/product/edit/:id', uploadFile.single('image'), (req, res) => {
     });
 });
 
-//go to top-product
-app.get('/top-product', isAdmin, (req, res) => {
-    res.render('admin/top_product', { layout: false });
-});
-
-//go to bill-summary
-app.get('/bill-summary', isAdmin, (req, res) => {
-    res.render('admin/bill_summary', { layout: false });
-});
 
 //go to staff-login
 app.get('/staff-login', (req, res) => {
@@ -1118,21 +1106,6 @@ app.post('/wishlist/add', (req, res) => {
     }
 });
 
-//go to comics
-app.get('/comics', (req, res) => {
-    res.render('user/comics');
-});
-
-//go to fiction
-app.get('/fiction', (req, res) => {
-    res.render('user/fiction');
-});
-
-//go to languages
-app.get('/lang', (req, res) => {
-    res.render('user/languages');
-});
-
 
 //go to contact
 app.get('/contact', (req, res) => {
@@ -1231,13 +1204,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
-
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
-  });
-
-  //all page link use wehn all page for html finished
-
-//Home start page
-
+});
