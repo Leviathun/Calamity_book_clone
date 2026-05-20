@@ -38,30 +38,36 @@
         Promotion
       </h2>
 
+      <% if (typeof activePromoGroup !== 'undefined' && activePromoGroup) { %>
       <div>
-        <div id="counter" class="counter">
+        <div id="counter" class="counter" data-endtime="<%= activePromoGroup.end_time.toISOString() %>">
           <ul class="countdown">
             <li class="first" style="display: none;">
-              <div class="countdown_num" id="cd_day-82520" style="display: none;"></div><div id="cd_day"></div>
+              <div class="countdown_num" id="cd_day" style="display: none;"></div><div id="cd_day_lbl"></div>
             </li>
             <li>
-              <div class="countdown_num" id="cd_hour-82520">07</div><div id="cd_hour">Hours</div>
+              <div class="countdown_num" id="cd_hour">00</div><div id="cd_hour_lbl">Hours</div>
             </li>
             <li>
-              <div class="countdown_num" id="cd_min-82520">38</div><div id="cd_minute">Minutes</div>
+              <div class="countdown_num" id="cd_min">00</div><div id="cd_minute_lbl">Minutes</div>
             </li>
             <li class="last">
-              <div class="countdown_num" id="cd_sec-82520">02</div><div id="cd_second">Seconds</div>
+              <div class="countdown_num" id="cd_sec">00</div><div id="cd_second_lbl">Seconds</div>
             </li>
           </ul>
           <div class="clear"><span>&nbsp;</span></div>
         </div>
-        <div id="expired" style="display:none;">The deadline has passed.</div>
+        <div id="expired" style="display:none; font-weight: bold; color: #ff4a5a;" class="ms-lg-3">Deadline passed! Resets happening...</div>
       </div>
+      <% } else { %>
+      <div class="promo-static-msg ms-lg-3 text-warning fw-bold d-flex align-items-center gap-2" style="font-size: 0.95rem; font-family: 'Inter', sans-serif;">
+        <i class="fa-solid fa-gift fa-bounce" style="color: #ff4a5a;"></i> Special discounts just for you!
+      </div>
+      <% } %>
     </div>
     
     <div class="btnViewall">
-      <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+      <a href="/all-books?tag=Promotion">View all <i class="fas fa-chevron-right fa-xs"></i></a>
     </div>
   </div>
 
@@ -77,14 +83,14 @@
     
     <div class="col-12 col-lg-9">
       <div class="products-con">
-        <% const filteredProducts = products.filter(product => product.percent !== 0).slice(0, 4);
+        <% const filteredProducts = products.filter(product => product.secondary_category === 'Promotion').slice(0, 4);
         if (filteredProducts.length === 0) { %>
           <p>No products available</p>
         <% } else { %>
           <% filteredProducts.forEach(product => { %>
-            <div class="products-item">
+            <div class="products-item" onclick="window.location.href='/product-page?id=<%= product.product_id %>'">
               <div class="products-img position-relative">
-                <a href="/product-page?id=<%= product.product_id %>">
+                <a href="/product-page?id=<%= product.product_id %>" onclick="event.stopPropagation();">
                   <img src="<%= product.img_url %>" alt="<%= product.product_name %>">
                 </a>
                 <p class="product-label position-absolute">
@@ -107,7 +113,7 @@
               </div>
               <div class="products-buy">
                 <div>
-                  <button class="addbag-b" onclick="addToCart(<%= product.product_id %>)"><p>Add to bag</p></button>
+                  <button class="addbag-b" onclick="event.stopPropagation(); addToCart(<%= product.product_id %>)"><p>Add to cart</p></button>
                 </div>
               </div>
             </div>
@@ -129,21 +135,21 @@
       </h2>                
     </div>
     <div class="btnViewall">
-      <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+      <a href="/all-books?tag=Bestseller">View all <i class="fas fa-chevron-right fa-xs"></i></a>
     </div>
   </div>
 
   <div class="row">
     <div class="col-12">
       <div class="products-con-common">
-        <% const bestsellerProducts = products.sort((a, b) => a.quantity - b.quantity).slice(0, 5);
+        <% const bestsellerProducts = products.filter(product => product.secondary_category === 'Bestseller').slice(0, 5);
         if (bestsellerProducts.length === 0) { %>
           <p>No bestseller products available</p>
         <% } else { %>
           <% bestsellerProducts.forEach(product => { %>
-            <div class="products-item">
+            <div class="products-item" onclick="window.location.href='/product-page?id=<%= product.product_id %>'">
               <div class="products-img position-relative">
-                <a href="/product-page?id=<%= product.product_id %>">
+                <a href="/product-page?id=<%= product.product_id %>" onclick="event.stopPropagation();">
                   <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                 </a>
               </div>
@@ -158,7 +164,7 @@
               </div>
               <div class="products-buy">
                 <div>
-                  <button class="addbag-b" onclick="addToCart(<%= product.product_id %>)"><p>Add to bag</p></button>
+                  <button class="addbag-b" onclick="event.stopPropagation(); addToCart(<%= product.product_id %>)"><p>Add to cart</p></button>
                 </div>
               </div>
             </div>
@@ -180,21 +186,21 @@
       </h2>                
     </div>
     <div class="btnViewall">
-      <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+      <a href="/all-books?tag=New%20Release">View all <i class="fas fa-chevron-right fa-xs"></i></a>
     </div>
   </div>
 
   <div class="row">
     <div class="col-12">
       <div class="products-con-common">
-        <% const newReleaseProducts = products.sort((a, b) => new Date(b.public_date) - new Date(a.public_date)).slice(0, 5);
+        <% const newReleaseProducts = products.filter(product => product.secondary_category === 'New Release').slice(0, 5);
         if (newReleaseProducts.length === 0) { %>
           <p>No new release products available</p>
         <% } else { %>
           <% newReleaseProducts.forEach(product => { %>
-            <div class="products-item">
+            <div class="products-item" onclick="window.location.href='/product-page?id=<%= product.product_id %>'">
               <div class="products-img position-relative">
-                <a href="/product-page?id=<%= product.product_id %>">
+                <a href="/product-page?id=<%= product.product_id %>" onclick="event.stopPropagation();">
                   <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                 </a>
               </div>
@@ -209,7 +215,7 @@
               </div>
               <div class="products-buy">
                 <div>
-                  <button class="addbag-b" onclick="addToCart(<%= product.product_id %>)"><p>Add to bag</p></button>
+                  <button class="addbag-b" onclick="event.stopPropagation(); addToCart(<%= product.product_id %>)"><p>Add to cart</p></button>
                 </div>
               </div>
             </div>
@@ -231,21 +237,21 @@
       </h2>                
     </div>
     <div class="btnViewall">
-      <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+      <a href="/all-books?tag=Highlight">View all <i class="fas fa-chevron-right fa-xs"></i></a>
     </div>
   </div>
 
   <div class="row">
     <div class="col-12">
       <div class="products-con-common">
-        <% const highlightProducts = products.sort((a, b) => b.star - a.star).slice(0, 5);
+        <% const highlightProducts = products.filter(product => product.secondary_category === 'Highlight').slice(0, 5);
         if (highlightProducts.length === 0) { %>
           <p>No highlight products available</p>
         <% } else { %>
           <% highlightProducts.forEach(product => { %>
-            <div class="products-item">
+            <div class="products-item" onclick="window.location.href='/product-page?id=<%= product.product_id %>'">
               <div class="products-img position-relative">
-                <a href="/product-page?id=<%= product.product_id %>">
+                <a href="/product-page?id=<%= product.product_id %>" onclick="event.stopPropagation();">
                   <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                 </a>
               </div>
@@ -260,7 +266,7 @@
               </div>
               <div class="products-buy">
                 <div>
-                  <button class="addbag-b" onclick="addToCart(<%= product.product_id %>)"><p>Add to bag</p></button>
+                  <button class="addbag-b" onclick="event.stopPropagation(); addToCart(<%= product.product_id %>)"><p>Add to cart</p></button>
                 </div>
               </div>
             </div>
@@ -282,21 +288,21 @@
       </h2>                
     </div>
     <div class="btnViewall">
-      <a href="/all-category">View all <i class="fas fa-chevron-right fa-xs"></i></a>
+      <a href="/all-books?tag=Coming%20Soon">View all <i class="fas fa-chevron-right fa-xs"></i></a>
     </div>
   </div>
 
   <div class="row">
     <div class="col-12">
       <div class="products-con-common">
-        <% const comingSoonProducts = products.filter(product => new Date(product.public_date) > new Date('2024-06-20')).slice(0, 5);
+        <% const comingSoonProducts = products.filter(product => product.secondary_category === 'Coming Soon').slice(0, 5);
         if (comingSoonProducts.length === 0) { %>
           <p>No coming soon products available</p>
         <% } else { %>
           <% comingSoonProducts.forEach(product => { %>
-            <div class="products-item">
+            <div class="products-item" onclick="window.location.href='/product-page?id=<%= product.product_id %>'">
               <div class="products-img position-relative">
-                <a href="/product-page?id=<%= product.product_id %>">
+                <a href="/product-page?id=<%= product.product_id %>" onclick="event.stopPropagation();">
                   <img src="<%= product.img_link %>" alt="<%= product.product_name %>">
                 </a>
               </div>
@@ -311,7 +317,7 @@
               </div>
               <div class="products-buy">
                 <div>
-                  <button class="addbag-b" onclick="addToCart(<%= product.product_id %>)"><p>Add to bag</p></button>
+                  <button class="addbag-b" onclick="event.stopPropagation(); addToCart(<%= product.product_id %>)"><p>Add to cart</p></button>
                 </div>
               </div>
             </div>

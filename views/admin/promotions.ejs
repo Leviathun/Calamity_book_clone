@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promotion Scheduler - Calamity Book Store</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #0f0f15;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .promotions-container {
+            flex: 1;
+            padding-bottom: 3rem;
+        }
+
+        .section-box {
+            background-color: #161626;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+        }
+
+        .section-title i {
+            color: #ff4a5a;
+        }
+
+        .search-bar {
+            background-color: #1b1b2f;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            background-color: #1e1e38;
+            border-color: #ff4a5a;
+            box-shadow: 0 0 0 0.25rem rgba(255, 74, 90, 0.25);
+            color: #ffffff;
+        }
+
+        .product-select-card {
+            background-color: #1b1b2f;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .product-select-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 74, 90, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-select-card.selected {
+            border-color: #ff4a5a;
+            background-color: rgba(255, 74, 90, 0.05);
+        }
+
+        .product-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #0f0f15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .product-img-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-select-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            accent-color: #ff4a5a;
+            cursor: pointer;
+        }
+
+        .promo-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background-color: #e11d48;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 2.6rem;
+        }
+
+        .product-author {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price-info {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .base-price {
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        .discount-pct-input-group {
+            margin-top: 0.75rem;
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .discount-pct-input-group.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scheduler-panel {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .scheduler-card {
+            background: linear-gradient(135deg, #1b1b2f 0%, #161626 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .selected-badge {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .selected-badge-title {
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+        }
+
+        .selected-badge-price {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .remove-badge-btn {
+            color: #ef4444;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.85rem;
+        }
+
+        .remove-badge-btn:hover {
+            color: #f87171;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: -1px;
+        }
+
+        .tab-btn.active {
+            color: #ff4a5a;
+            border-bottom-color: #ff4a5a;
+        }
+
+        .table-dark-custom {
+            background-color: #1b1b2f;
+            color: #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-width: 850px;
+        }
+
+        .table-dark-custom th {
+            background-color: #161626;
+            color: #ffffff;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .table-dark-custom td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table-dark-custom tr:last-child td {
+            border-bottom: none;
+        }
+
+        #admin-toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-toast {
+            min-width: 320px;
+            background-color: #161626;
+            border-left: 5px solid #10b981;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            color: #ffffff;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .admin-toast.show {
+            transform: translateX(0);
+        }
+
+        .admin-toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .admin-toast i {
+            font-size: 1.5rem;
+        }
+
+        .admin-toast.success i {
+            color: #10b981;
+        }
+
+        .admin-toast.error i {
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Unified Admin Nav-bar -->
+    <%- include('../templates/nav-bar-admin', { activeTab: 'promotions' }) %>
+
+        <div class="container-fluid px-4 promotions-container">
+            <!-- Tab Navigation -->
+            <div class="d-flex align-items-end mb-4 border-bottom border-secondary" style="gap: 15px;">
+                <button class="tab-btn active" id="tab-create-btn" onclick="switchTab('create')">
+                    <i class="fas fa-plus-circle me-1"></i> Create Promotion
+                </button>
+                <button class="tab-btn" id="tab-history-btn" onclick="switchTab('history')">
+                    <i class="fas fa-history me-1"></i> Promotion History
+                </button>
+            </div>
+
+            <!-- Tab 1: Create Promotion Group -->
+            <div id="tab-create-content" class="row">
+                <!-- Left Side: Product Selection Grid -->
+                <div class="col-12 col-lg-8 mb-4">
+                    <div class="section-box h-100">
+                        <div
+                            class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+                            <h2 class="section-title mb-0 border-bottom-0 pb-0">
+                                <i class="fas fa-book"></i> Select Books for Promotion
+                            </h2>
+                            <div class="position-relative">
+                                <input type="text" id="product-search" class="form-control search-bar"
+                                    placeholder="Search book name..." oninput="filterProducts()">
+                                <i class="fas fa-search position-absolute text-muted"
+                                    style="top: 50%; right: 15px; transform: translateY(-50%);"></i>
+                            </div>
+                        </div>
+
+                        <!-- Products Grid -->
+                        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3" id="products-grid">
+                            <% products.forEach(product=> { %>
+                                <div class="col product-item-col"
+                                    data-title="<%= (product.product_name || '').toLowerCase() %>"
+                                    data-author="<%= (product.author || '').toLowerCase() %>"
+                                    data-id="<%= product.product_id %>">
+                                    <div class="product-select-card" id="card-<%= product.product_id %>"
+                                        onclick="toggleSelectProduct(<%= product.product_id %>)">
+                                        <!-- Checkbox overlay -->
+                                        <input type="checkbox" class="product-select-checkbox"
+                                            id="check-<%= product.product_id %>"
+                                            onclick="event.stopPropagation(); toggleSelectProduct(<%= product.product_id %>)">
+
+                                        <!-- Active Promotion Indicator -->
+                                        <% if (product.promo_group_id) { %>
+                                            <span class="promo-badge">
+                                                <%= product.percent %>% OFF
+                                            </span>
+                                            <% } %>
+
+                                                <!-- Cover Image -->
+                                                <div class="product-img-wrapper">
+                                                    <img src="<%= product.img_url %>"
+                                                        alt="<%= product.product_name || '' %>"
+                                                        onerror="this.src='/ImgAssets/Logo.png'">
+                                                </div>
+
+                                                <!-- Details -->
+                                                <div class="product-title" title="<%= product.product_name || '' %>">
+                                                    <%= product.product_name || '' %>
+                                                </div>
+                                                <div class="product-author" title="<%= product.author || '' %>">
+                                                    <%= product.author || '' %>
+                                                </div>
+
+                                                <div class="product-price-info">
+                                                    <span class="text-muted small">Price:</span>
+                                                    <span class="base-price">฿<%= product.price %></span>
+                                                </div>
+
+                                                <!-- Percentage Input Group -->
+                                                <div class="discount-pct-input-group"
+                                                    id="discount-group-<%= product.product_id %>"
+                                                    onclick="event.stopPropagation()">
+                                                    <label class="form-label small text-muted mb-1">Discount %:</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="number"
+                                                            class="form-control bg-dark border-secondary text-white discount-pct-input"
+                                                            id="pct-<%= product.product_id %>" min="1" max="99"
+                                                            value="10"
+                                                            oninput="updateSummaryDiscount(<%= product.product_id %>, this.value)">
+                                                        <span
+                                                            class="input-group-text bg-secondary border-secondary text-white">%</span>
+                                                    </div>
+                                                </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Scheduler Settings Sidebar -->
+                <div class="col-12 col-lg-4 mb-4">
+                    <div class="scheduler-panel">
+                        <div class="scheduler-card">
+                            <h3 class="border-bottom border-secondary pb-3 mb-3 text-white d-flex align-items-center"
+                                style="font-size: 1.15rem; font-weight: 700;">
+                                <i class="fas fa-clock text-danger me-2"></i> Promotion Settings
+                            </h3>
+
+                            <form id="create-promo-form" onsubmit="submitPromotionGroup(event)">
+                                <div class="mb-3">
+                                    <label for="group-name" class="form-label small text-white-50">Promotion Group
+                                        Name</label>
+                                    <input type="text" id="group-name"
+                                        class="form-control bg-dark border-secondary text-white py-2"
+                                        placeholder="e.g. Midnight Flash Sale" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="duration-hours" class="form-label small text-white-50">Duration
+                                        (Hours)</label>
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" id="duration-hours"
+                                            class="form-control bg-dark border-secondary text-white py-2"
+                                            placeholder="e.g. 7" required min="0.01">
+                                        <span
+                                            class="input-group-text bg-secondary border-secondary text-white">Hours</span>
+                                    </div>
+                                    <div class="form-text text-muted small">You can use decimals for testing (e.g. 0.02
+                                        is approx. 72 secs)</div>
+                                </div>
+
+                                <!-- Selected Books Summary List -->
+                                <div class="mb-4">
+                                    <label class="form-label small text-white-50 d-flex justify-content-between">
+                                        <span>Selected Books</span>
+                                        <span id="selected-count" class="badge bg-danger">0 selected</span>
+                                    </label>
+                                    <div id="selected-list"
+                                        style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                                        <div class="text-muted small text-center py-3">No books selected. Check books on
+                                            the left grid.</div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-danger w-100 py-2 fw-bold" id="submit-btn"
+                                    style="box-shadow: 0 4px 15px rgba(255, 74, 90, 0.4);">
+                                    <i class="fas fa-bolt me-1"></i> Start Promotion Group
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Promotion History / Scheduler Overview -->
+            <div id="tab-history-content" style="display: none;">
+                <div class="section-box">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i> Promotion Scheduler Logs
+                    </h2>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom">
+                            <thead>
+                                <tr>
+                                    <th>Group ID</th>
+                                    <th>Group Name</th>
+                                    <th>Duration</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (groups.length===0) { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">No promotion group
+                                            scheduling history found.</td>
+                                    </tr>
+                                    <% } else { %>
+                                        <% groups.forEach(group=> { %>
+                                            <tr>
+                                                <td>#<%= group.group_id %>
+                                                </td>
+                                                <td class="fw-bold text-white">
+                                                    <%= group.group_name %>
+                                                </td>
+                                                <td>
+                                                    <%= group.duration_hours %> hrs
+                                                </td>
+                                                <td>
+                                                    <%= new Date(group.start_time).toLocaleString() %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(group.end_time).toLocaleString() %>
+                                                </td>
+                                                <td>
+                                                    <% if (group.is_active && new Date(group.end_time)> new Date()) { %>
+                                                        <span class="badge bg-success px-3 py-2"><i
+                                                                class="fas fa-circle-notch fa-spin me-1"></i>
+                                                            Active</span>
+                                                        <% } else { %>
+                                                            <span class="badge bg-secondary px-3 py-2">Ended</span>
+                                                            <% } %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Premium Toast Container -->
+        <div id="admin-toast-container"></div>
+
+        <script>
+            const selectedProducts = new Set();
+            const productsMap = {};
+
+        // Hydrate product objects in JS context
+        <% products.forEach(product => { %>
+            productsMap[<%= product.product_id %>] = {
+                id: <%= product.product_id %>,
+                name: <%- JSON.stringify(product.product_name || '') %>,
+                price: <%= product.price %>,
+                percent: 10
+            };
+        <% }) %>
+
+                function switchTab(tab) {
+                    document.getElementById('tab-create-btn').classList.toggle('active', tab === 'create');
+                    document.getElementById('tab-history-btn').classList.toggle('active', tab === 'history');
+                    document.getElementById('tab-create-content').style.display = (tab === 'create') ? 'flex' : 'none';
+                    document.getElementById('tab-history-content').style.display = (tab === 'history') ? 'block' : 'none';
+                }
+
+            function filterProducts() {
+                const query = document.getElementById('product-search').value.toLowerCase().trim();
+                const cols = document.querySelectorAll('.product-item-col');
+                cols.forEach(col => {
+                    const title = col.getAttribute('data-title');
+                    const author = col.getAttribute('data-author');
+                    if (title.includes(query) || author.includes(query)) {
+                        col.style.display = 'block';
+                    } else {
+                        col.style.display = 'none';
+                    }
+                });
+            }
+
+            function toggleSelectProduct(id) {
+                const card = document.getElementById(`card-${id}`);
+                const checkbox = document.getElementById(`check-${id}`);
+                const discountGroup = document.getElementById(`discount-group-${id}`);
+
+                if (selectedProducts.has(id)) {
+                    selectedProducts.delete(id);
+                    card.classList.remove('selected');
+                    checkbox.checked = false;
+                    discountGroup.classList.remove('show');
+                } else {
+                    selectedProducts.add(id);
+                    card.classList.add('selected');
+                    checkbox.checked = true;
+                    discountGroup.classList.add('show');
+                }
+
+                updateSelectedSummary();
+            }
+
+            function updateSummaryDiscount(id, val) {
+                const percent = parseInt(val, 10) || 0;
+                if (productsMap[id]) {
+                    productsMap[id].percent = percent;
+                }
+                const badgePct = document.getElementById(`summary-pct-${id}`);
+                if (badgePct) {
+                    badgePct.innerText = `${percent}%`;
+                }
+            }
+
+            function removeSelectedProduct(id) {
+                toggleSelectProduct(id);
+            }
+
+            function updateSelectedSummary() {
+                const selectedList = document.getElementById('selected-list');
+                const selectedCountLabel = document.getElementById('selected-count');
+
+                selectedCountLabel.innerText = `${selectedProducts.size} selected`;
+
+                if (selectedProducts.size === 0) {
+                    selectedList.innerHTML = `<div class="text-muted small text-center py-3">No books selected. Check books on the left grid.</div>`;
+                    return;
+                }
+
+                let html = '';
+                selectedProducts.forEach(id => {
+                    const item = productsMap[id];
+                    html += `
+                    <div class="selected-badge" id="summary-item-${id}">
+                        <div class="d-flex flex-column">
+                            <span class="selected-badge-title" title="${item.name}">${item.name}</span>
+                            <span class="text-white-50 small mt-1">Base Price: ฿${item.price}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge bg-danger" id="summary-pct-${id}">${item.percent}%</span>
+                            <button class="remove-badge-btn" onclick="removeSelectedProduct(${id})">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                });
+                selectedList.innerHTML = html;
+            }
+
+            function showAdminToast(message, type = 'success') {
+                const container = document.getElementById('admin-toast-container');
+                const toast = document.createElement('div');
+                toast.className = `admin-toast ${type}`;
+
+                let iconClass = 'fa-circle-check';
+                if (type === 'error') iconClass = 'fa-circle-xmark';
+
+                toast.innerHTML = `
+                <i class="fa-solid ${iconClass}"></i>
+                <div class="fw-bold">${message}</div>
+            `;
+                container.appendChild(toast);
+
+                // Force reflow and show
+                setTimeout(() => toast.classList.add('show'), 50);
+
+                // Auto dismiss
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
+            }
+
+            async function submitPromotionGroup(event) {
+                event.preventDefault();
+
+                if (selectedProducts.size === 0) {
+                    showAdminToast('Please select at least one book for the promotion group.', 'error');
+                    return;
+                }
+
+                const groupName = document.getElementById('group-name').value.trim();
+                const durationHours = parseFloat(document.getElementById('duration-hours').value);
+
+                if (!groupName || isNaN(durationHours) || durationHours <= 0) {
+                    showAdminToast('Please enter a valid promotion name and duration.', 'error');
+                    return;
+                }
+
+                const payloadProducts = [];
+                selectedProducts.forEach(id => {
+                    const item = productsMap[id];
+                    payloadProducts.push({
+                        id: item.id,
+                        percent: item.percent
+                    });
+                });
+
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i> Starting group...`;
+
+                try {
+                    const response = await fetch('/admin/promotion/create-group', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            groupName,
+                            durationHours,
+                            products: payloadProducts
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showAdminToast(data.message, 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showAdminToast(data.message || 'Failed to create promotion group.', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="fas fa-bolt me-1"></i> Start Promotion Group`;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showAdminToast('A server error occurred. Please try again.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="fas fa-bolt me-1"></i> Start Promotion Group`;
+                }
+            }
+        </script>
+</body>
+
+</html>

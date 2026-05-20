@@ -207,6 +207,7 @@
 
 <script>
 // Wishlist: Add to cart
+// Wishlist: Add to cart
 async function wlAddToCart(productId) {
   try {
     const res = await fetch('/cart/add', {
@@ -216,14 +217,18 @@ async function wlAddToCart(productId) {
     });
     const data = await res.json();
     if (res.status === 401) {
-      alert(data.message);
-      window.location.href = '/login';
+      showToast(data.message, 'error');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
+    } else if (data.success) {
+      showToast(data.message, 'success');
     } else {
-      alert(data.message);
+      showToast('Failed: ' + data.message, 'error');
     }
   } catch (e) {
     console.error(e);
-    alert('Error adding to cart');
+    showToast('Error adding to cart', 'error');
   }
 }
 
@@ -240,10 +245,11 @@ async function wlRemove(wishlistId) {
     if (data.success) {
       location.reload();
     } else {
-      alert(data.message || 'Error removing item');
+      showToast(data.message || 'Error removing item', 'error');
     }
   } catch (e) {
     console.error(e);
+    showToast('Error removing item', 'error');
   }
 }
 </script>
