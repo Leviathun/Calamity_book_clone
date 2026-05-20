@@ -129,7 +129,7 @@
   padding-top: 2px;
   letter-spacing: 1px;
 }
-#cd_day, #cd_hour, #cd_minute, #cd_second {
+#cd_day_lbl, #cd_hour_lbl, #cd_minute_lbl, #cd_second_lbl {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -439,12 +439,20 @@ span.line-discount {
     gap: 0.75rem;
   }
   .countdown li {
-    width: 50px;
-    height: 40px;
+    width: 65px;
+    height: 48px;
     font-size: 0.65rem;
+    padding: 6px 4px;
   }
   .counter ul.countdown li div.countdown_num {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
+  }
+  #cd_day_lbl,
+  #cd_hour_lbl,
+  #cd_minute_lbl,
+  #cd_second_lbl {
+    font-size: 0.52rem !important;
+    letter-spacing: 0.5px !important;
   }
   .bg-bot {
     display: none;

@@ -57,18 +57,199 @@ nav {
   .navbar-layout-container {
     flex-wrap: wrap !important;
   }
-  .navbar-center {
-    order: 3;
-    width: 100%;
-    max-width: 100%;
-    padding: 12px 0 0 0;
-    margin: 0 auto;
+  
+  /* Row 1: Logo Centered on Mobile */
+  .navbar-left {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    order: 1 !important;
+    padding: 8px 0 6px 0 !important;
   }
-  .navbar-right {
-    order: 2;
+  
+  .navbar-brand {
+    margin-right: 0 !important;
+  }
+  
+  .navbar-brand img {
+    width: 135px !important;
+    padding: 6px 12px !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Row 2: Search Bar & Toggler Button side-by-side with beautiful separation */
+  .navbar-center {
+    order: 2 !important;
+    flex: 1 1 auto !important;
+    width: calc(100% - 75px) !important;
+    max-width: calc(100% - 75px) !important;
+    padding: 8px 8px 8px 15px !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
   }
   .search-bar {
     width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  .navbar-right {
+    order: 3 !important;
+    flex: 0 0 75px !important;
+    width: 75px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 8px 15px 8px 8px !important;
+    margin: 0 !important;
+  }
+
+  /* Hamburger Toggler Custom Styling */
+  .navbar-toggler {
+    border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    transition: all 0.3s ease;
+  }
+  .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2) !important;
+    outline: none;
+  }
+  .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.95%29' stroke-width='2.5' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* Full-width Glassmorphic Dropdown Drawer */
+  .navbar-collapse {
+    position: absolute !important;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(10, 124, 110, 0.98) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 9999;
+    padding: 24px 20px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 4px solid var(--nav-accent, #F59E0B) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+    border-radius: 0 0 16px 16px;
+    margin: 0;
+  }
+
+  /* Glassmorphic User Tab Cards on Mobile - Center everything */
+  .navbar-icons {
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    margin: 0 0 20px 0 !important;
+    width: 100% !important;
+    padding-bottom: 16px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+  .navbar-icons .nav-item {
+    flex: 1;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    margin: 0 6px !important;
+    padding: 16px 6px !important; /* Premium height for vertical centering */
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 12px !important;
+  }
+  .navbar-icons .nav-item a.nav-link {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    gap: 8px !important; /* Perfect uniform vertical spacing between icon and text */
+  }
+  .navbar-icons .nav-item a.nav-link br {
+    display: none !important; /* Hide standard br element to prevent vertical misalignment */
+  }
+  .navbar-icons .nav-item a.nav-link p {
+    margin: 0 !important; /* Strip standard margin to ensure mathematically centered position */
+  }
+  .navbar-icons .nav-item:hover, .navbar-icons .nav-item.active-item {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+  }
+  
+  /* Bright High-Contrast Text Labels */
+  .navbar-icons .hide {
+    display: inline !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    color: #FFFFFF !important;
+    opacity: 0.9;
+  }
+  .navbar-icons .active-item .hide {
+    color: var(--nav-accent, #F59E0B) !important;
+    opacity: 1;
+  }
+
+  /* Sleek Drawer Category Menu Links */
+  .mobile-drawer-links {
+    list-style: none;
+    padding: 0 !important;
+    margin: 15px 0 0 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .mobile-drawer-links .nav-item-but {
+    width: 100%;
+  }
+  .mobile-drawer-links .nav-item-but a {
+    display: block;
+    padding: 12px 16px !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-decoration: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid transparent;
+    transition: all 0.25s ease;
+  }
+  .mobile-drawer-links .nav-item-but a:hover {
+    color: #FFFFFF !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-left: 3px solid var(--nav-accent, #F59E0B) !important;
+    padding-left: 20px !important;
+  }
+  .mobile-drawer-links .nav-item-but a.active-link {
+    color: var(--nav-accent, #F59E0B) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-left: 3px solid var(--nav-accent, #F59E0B) !important;
+  }
+}
+
+/* Category Dropdown optimization for mobile phones */
+@media (max-width: 768px) {
+  .dropdown {
+    width: 110px !important;
+    flex: 0 0 110px !important;
+  }
+  .dropdown-text {
+    padding: 0 0.8rem !important;
+    font-size: 0.85rem !important;
+  }
+  .dropdown-list {
+    min-width: 130px !important;
   }
 }
 

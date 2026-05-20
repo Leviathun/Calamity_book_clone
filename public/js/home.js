@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
   let input = document.getElementById("search-input");
   let listItem = document.querySelectorAll(".dropdown-list-item");
 
+  if (!dropdownBtn || !list || !icon || !input) {
+    return; // Safe check for pages without user search navbar
+  }
+
   dropdownBtn.onclick = function () {
     if (list.classList.contains('show')) {
       icon.style.transform = "rotate(0deg)";
@@ -28,7 +32,10 @@ document.addEventListener('DOMContentLoaded', function () {
   listItem.forEach(item => {
     item.onclick = (e) => {
       e.preventDefault();
-      dropdownBtn.querySelector('span').innerText = e.target.innerText;
+      const span = dropdownBtn.querySelector('span');
+      if (span) {
+        span.innerText = e.target.innerText;
+      }
       if (e.target.innerText === "All category") {
         input.placeholder = "Find your favorite book...";
       } else {
@@ -87,6 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (!cdHour || !cdMin || !cdSec) return;
 
+  const nowOnLoad = new Date().getTime();
+  const initialDiff = endTime - nowOnLoad;
+
   const timerInterval = setInterval(function() {
     const now = new Date().getTime();
     const diff = endTime - now;
@@ -101,10 +111,13 @@ document.addEventListener('DOMContentLoaded', function() {
         expiredEl.style.display = 'block';
       }
       
-      // Force reload after 3 seconds to sync updated catalog prices
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      // Force reload after 3 seconds ONLY if the promotion was active when page loaded
+      // This prevents infinite reload loop if server is slow to sync/deactivate group
+      if (initialDiff > 0) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      }
       return;
     }
 
@@ -118,3 +131,4 @@ document.addEventListener('DOMContentLoaded', function() {
     cdSec.innerText = String(seconds).padStart(2, '0');
   }, 1000);
 });
+
