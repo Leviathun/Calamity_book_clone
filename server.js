@@ -82,10 +82,11 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "root",
-    password: "Tun-48449",
-    database: "ca_book"
+    host: process.env.DB_HOST || "127.0.0.1",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "Tun-48449",
+    database: process.env.DB_DATABASE || "ca_book",
+    port: process.env.DB_PORT || 3306
 });
 
 // Connect to MySQL

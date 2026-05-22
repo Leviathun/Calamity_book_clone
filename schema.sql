@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS ca_book;
-USE ca_book;
+-- CREATE DATABASE IF NOT EXISTS ca_book;
+-- USE ca_book;
 
 -- 1. Users & Login Info (Combined into one table for simplicity)
 CREATE TABLE IF NOT EXISTS users (
@@ -8,6 +8,14 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1.5 Staff / Admins
+CREATE TABLE IF NOT EXISTS staff (
+    admin_id VARCHAR(50) PRIMARY KEY,
+    admin_name VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -28,6 +36,16 @@ CREATE TABLE IF NOT EXISTS category (
     img_url VARCHAR(255)
 );
 
+-- 3.5 Promotion Groups
+CREATE TABLE IF NOT EXISTS promotion_groups (
+    group_id INT AUTO_INCREMENT PRIMARY KEY,
+    group_name VARCHAR(255) NOT NULL,
+    duration_hours DECIMAL(5,2) NOT NULL,
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    end_time DATETIME NOT NULL,
+    is_active TINYINT DEFAULT 1
+);
+
 -- 4. Product
 CREATE TABLE IF NOT EXISTS product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +61,9 @@ CREATE TABLE IF NOT EXISTS product (
     public_date DATE,
     star DECIMAL(3,1) DEFAULT 0.0,
     secondary_category VARCHAR(255) DEFAULT NULL, -- Added to support Promotion, Bestseller, Highlight tags
-    FOREIGN KEY (category_id) REFERENCES category(category_id) ON DELETE SET NULL
+    promo_group_id INT DEFAULT NULL, -- Added to support group promotions
+    FOREIGN KEY (category_id) REFERENCES category(category_id) ON DELETE SET NULL,
+    FOREIGN KEY (promo_group_id) REFERENCES promotion_groups(group_id) ON DELETE SET NULL
 );
 
 -- 5. Shopping Cart
