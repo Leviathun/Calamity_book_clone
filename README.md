@@ -2,7 +2,7 @@
 
 A full-stack online bookstore web application built with **Node.js**, **Express**, **MySQL**, and **EJS**. Features a complete e-commerce experience including product browsing, shopping cart, wishlist, order management, and a powerful admin dashboard.
 
-> 🌐 **Live Demo:** [calamity-book-clone.onrender.com](https://calamity-book-clone.onrender.com)
+> 🌐 **Live Demo:** [https://calamity-book-project.onrender.com](https://calamity-book-project.onrender.com)
 
 ---
 
